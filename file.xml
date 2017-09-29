@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DogEvidenceRecord>
+    <Name>Chuck Norris</Name>
+    <Dog Colour="6" Breed="Labrador Retriever" Gender="Male" BirthDate="09/29/2017">
+        <Name>Jawa</Name>
+    </Dog>
+    <Dog Colour="-1" Breed="German Shepherd" Gender="Male" BirthDate="09/29/2017">
+        <Name>Rex</Name>
+    </Dog>
+    <Dog Colour="2" Breed="exception throw" Gender="Male" BirthDate="09/29/2017">
+        <Name>Trabant</Name>
+    </Dog>
+    <Dog Colour="5" Breed="German Shepherd" Gender="Male" BirthDate="09/29/2017">
+        <Name>Rex</Name>
+    </Dog>
+    <Contact>
+        <TelephoneNumber>0901 123 456</TelephoneNumber>
+        <Email>chuck.norris@gmail.com</Email>
+    </Contact>
+    <RequestDate>09/29/2017</RequestDate>
+    <City>Bratislava</City>
+</DogEvidenceRecord>
