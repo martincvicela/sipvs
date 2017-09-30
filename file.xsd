@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" elementFormDefault="qualified">
+
+	<xs:element name="DogEvidenceRecord" type="DogEvidenceRecordType"/>
+	
+	<xs:complexType name="DogEvidenceRecordType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="Contact" type="ContactType"/>
+			<xs:element name="Dog" type="DogType" maxOccurs="unbounded"/>
+			<xs:element name="City" type="xs:string"/>
+			<xs:element name="RequestDate" type="xs:date"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ContactType">
+		<xs:sequence>
+			<xs:element name="TelephoneNumber" type="TelephoneNumberType"/>
+			<xs:element name="Email" type="EmailType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="TelephoneNumberType">
+		<xs:restriction base="xs:string">
+			 <xs:pattern value="\+?([ 0-9/])*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="EmailType">
+		<xs:restriction base="xs:string">
+			 <xs:pattern value="[^@]+@[^\.]+\..+"/>
+			 <xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="DogType" >
+		<xs:sequence>
+			<xs:element name="BirthDate" type="xs:date"/>
+			<xs:element name="Name" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="Breed" type="xs:string" use="required"/>
+		<xs:attribute name="Gender" type="GenderType" use="required"/>
+		<xs:attribute name="Colour" type="xs:string" use="required"/>
+	</xs:complexType>
+	  
+	<xs:simpleType name="GenderType">
+		<xs:restriction base="xs:string">
+			 <xs:pattern value="pes|fena"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
