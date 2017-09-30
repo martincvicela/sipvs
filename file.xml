@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<?xml-stylesheet type="text/xsl" href="file.xsl"?>
+<?xml-stylesheet type='text/xsl' href="file.xsl" ?>
 <DogEvidenceRecord>
     <Name>Chuck Norris</Name>
-    <Dog Colour="primalex" Breed="Labrador Retriever" Gender="pes">
-        <Name>Jawa</Name>
-        <BirthDate>09/29/2017</BirthDate>
-    </Dog>
-    <Dog Colour="pink" Breed="German Shepherd" Gender="pes">
-        <Name>Rex</Name>
-        <BirthDate>09/29/2017</BirthDate>
-    </Dog>
-    <Dog Colour="Belinka" Breed="exception throw" Gender="pes">
-        <Name>Trabant</Name>
-        <BirthDate>09/29/2017</BirthDate>
-    </Dog>
     <Contact>
         <TelephoneNumber>0901 123 456</TelephoneNumber>
         <Email>chuck.norris@gmail.com</Email>
     </Contact>
-    <RequestDate>09/29/2017</RequestDate>
+    <Dog Breed="Labrador Retriever" Gender="pes" Colour="primalex" EvidenceNumber="14789">
+        <BirthDate>2017-09-30</BirthDate>
+        <Name>Jawa</Name>
+    </Dog>
+    <Dog Breed="German Shepherd" Gender="pes" Colour="pink" EvidenceNumber="15467">
+        <BirthDate>2017-09-30</BirthDate>
+        <Name>Rex</Name>
+    </Dog>
+    <Dog Breed="exception throw" Gender="pes" Colour="Belinka" EvidenceNumber="654">
+        <BirthDate>2017-09-30</BirthDate>
+        <Name>Trabant</Name>
+    </Dog>
     <City>Bratislava</City>
+    <RequestDate>2017-09-30</RequestDate>
 </DogEvidenceRecord>

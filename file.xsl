@@ -9,15 +9,15 @@
 					margin-bottom: 2%;
 				} 
 			</style>
-			<div style="margin-left:10%; margin-right:50%; border:solid; border-width:1px">
+			<div style="margin-left:10%; margin-right:45%; border:solid; border-width:1px">
 				<div style="margin-left:5%;">
 					<div>
 						<h4 style="text-align:center;">Prihlásenie psov do evidencie</h4>
 					</div>
 					<xsl:call-template name="ContactInfo"/>
 					<div>Zoznam psov:</div>
-					<table style="margin-bottom:2%;" border="1">
-						<tr>
+					<table style="margin-bottom:2%; margin-right:5%;" border="1">
+						<tr bgcolor="#d3d3d3">
 							<th>Dátum narodenia</th>
 							<th>Meno</th>
 							<th>Plemeno</th>

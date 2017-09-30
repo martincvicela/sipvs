@@ -1,3 +1,4 @@
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,6 +17,8 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -129,12 +132,12 @@ public class MainGUI {
 		btnAddDog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Date selectedDate = (Date) datePicker.getModel().getValue();
-				DateFormat df = new SimpleDateFormat("dd/MM/yyyy"); // e.g.
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // e.g.
 																	// MM/dd/yyyy
 																	// HH:mm:ss
 				String reportDate = df.format(selectedDate);
 				JOptionPane.showMessageDialog(null, "My Goodness, this is so beautiful" + reportDate);
-				modeldog.addRow(new Dog("black", "Rex", "German Shepherd"));
+				modeldog.addRow(new Dog("black", "Rex", "German Shepherd", 9875));
 				modeldog.fireTableDataChanged();
 			}
 		});
@@ -190,10 +193,25 @@ public class MainGUI {
 		btn_ValidateXml.setBounds(10, 473, 108, 23);
 		frame.getContentPane().add(btn_ValidateXml);
 
-		JButton btn_TransformToHtml = new JButton("Exportuj do HTML");
+		JButton btn_TransformToHtml = new JButton("Zobraz formulár");
 		btn_TransformToHtml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//e.g. DogEvidenceRecord record = getDogEvidenceRecordFromGUI();
+				if (!Desktop.isDesktopSupported()) {
+		            System.err.println("Desktop not supported!");
+		            System.exit(-1);
+		        }
+
+		        Desktop desktop = Desktop.getDesktop();
+		        File file = new File("file.xml");
+
+		        if (desktop.isSupported(Desktop.Action.OPEN)) {
+		            try {
+		                desktop.open(file);
+		            }
+		            catch (IOException ioe) {
+		                System.err.println("Unable to open: " + file.getName());
+		            }
+		        }
 			}
 		});
 		btn_TransformToHtml.setBounds(128, 473, 136, 23);

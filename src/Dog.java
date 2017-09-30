@@ -8,24 +8,28 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Dog")
 public class Dog{
-	@XmlAttribute(name = "Colour")
-	public String colour = "pink";
+	
+	Date birthDateWithTime = new Date();
+	DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
+	@XmlElement(name = "BirthDate")
+	String birthDate= outputFormatter.format(birthDateWithTime);
 	@XmlElement(name = "Name")
 	public String name = "Rex";
 	@XmlAttribute(name = "Breed")
 	public String breed = "German Shepherd";
 	@XmlAttribute(name = "Gender")
 	public String gender = "pes";	
-	Date birthDateWithTime = new Date();
-	DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-	@XmlElement(name = "BirthDate")
-	String birthDate= outputFormatter.format(birthDateWithTime);
+	@XmlAttribute(name = "Colour")
+	public String colour = "pink";
+	@XmlAttribute(name = "EvidenceNumber")
+	public Integer eNumber = 15467;
 	
-	public Dog(String colour, String name, String breed) {
+	public Dog(String colour, String name, String breed, Integer eNumber) {
 		super();
 		this.colour = colour;
 		this.name = name;
 		this.breed = breed;
+		this.eNumber = eNumber;
 	}
 	public Dog() {
 		super();

@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 public class DogModel extends AbstractTableModel {
 
 private static final long serialVersionUID = 1L;
-private static final String[] columnNames = { "Datum narodenia", "Meno", "Plemeno", "Pohlavie", "Farba"};
+private static final String[] columnNames = { "Datum narodenia", "Meno", "Plemeno", "Pohlavie", "Farba", "Evidenèné èíslo psa (èíslo známky)"};
 private ArrayList<Dog> dogs;
 
 public ArrayList<Dog> getDogs() {
@@ -19,9 +19,9 @@ public void setDogs(ArrayList<Dog> dogs) {
 
 public DogModel(){
     dogs =  new ArrayList<Dog>();
-    dogs.add(new Dog("primalex", "Jawa", "Labrador Retriever"));
+    dogs.add(new Dog("primalex", "Jawa", "Labrador Retriever", 14789));
     dogs.add(new Dog());
-    dogs.add(new Dog("Belinka", "Trabant", "exception throw"));
+    dogs.add(new Dog("Belinka", "Trabant", "exception throw", 654));
 }
 
 public void addRow(Dog rowData)
@@ -57,7 +57,9 @@ public Object getValueAt(int rowIndex, int columnIndex) {
     case 3:
     	return dogs.get(rowIndex).gender;
     case 4:
-    	return dogs.get(rowIndex).colour;    	
+    	return dogs.get(rowIndex).colour;  
+    case 5:
+    	return dogs.get(rowIndex).eNumber;	
     }
     return null;
 }
