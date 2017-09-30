@@ -21,7 +21,7 @@ public class Dog{
 	public String gender = "pes";	
 	@XmlAttribute(name = "Colour")
 	public String colour = "pink";
-	@XmlAttribute(name = "EvidenceNumber")
+	@XmlElement(name = "EvidenceNumber")
 	public Integer eNumber = 15467;
 	
 	public Dog(String colour, String name, String breed, Integer eNumber) {

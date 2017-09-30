@@ -6,17 +6,20 @@
         <TelephoneNumber>0901 123 456</TelephoneNumber>
         <Email>chuck.norris@gmail.com</Email>
     </Contact>
-    <Dog Breed="Labrador Retriever" Gender="pes" Colour="primalex" EvidenceNumber="14789">
+    <Dog Breed="Labrador Retriever" Gender="pes" Colour="primalex">
         <BirthDate>2017-09-30</BirthDate>
         <Name>Jawa</Name>
+        <EvidenceNumber>14789</EvidenceNumber>
     </Dog>
-    <Dog Breed="German Shepherd" Gender="pes" Colour="pink" EvidenceNumber="15467">
+    <Dog Breed="German Shepherd" Gender="pes" Colour="pink">
         <BirthDate>2017-09-30</BirthDate>
         <Name>Rex</Name>
+        <EvidenceNumber>15467</EvidenceNumber>
     </Dog>
-    <Dog Breed="exception throw" Gender="pes" Colour="Belinka" EvidenceNumber="654">
+    <Dog Breed="exception throw" Gender="pes" Colour="Belinka">
         <BirthDate>2017-09-30</BirthDate>
         <Name>Trabant</Name>
+        <EvidenceNumber>654</EvidenceNumber>
     </Dog>
     <City>Bratislava</City>
     <RequestDate>2017-09-30</RequestDate>
