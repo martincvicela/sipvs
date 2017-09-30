@@ -182,10 +182,20 @@ public class MainGUI {
 		textField_telephone.setColumns(10);
 
 		JButton btn_ValidateXml = new JButton("Validuj Xml");
+		btn_ValidateXml.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//e.g. DogEvidenceRecord record = getDogEvidenceRecordFromGUI();
+			}
+		});
 		btn_ValidateXml.setBounds(10, 473, 108, 23);
 		frame.getContentPane().add(btn_ValidateXml);
 
 		JButton btn_TransformToHtml = new JButton("Exportuj do HTML");
+		btn_TransformToHtml.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//e.g. DogEvidenceRecord record = getDogEvidenceRecordFromGUI();
+			}
+		});
 		btn_TransformToHtml.setBounds(128, 473, 136, 23);
 		frame.getContentPane().add(btn_TransformToHtml);
 
