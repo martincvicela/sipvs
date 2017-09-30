@@ -23,7 +23,7 @@
 							<th>Plemeno</th>
 							<th>Pohlavie</th>
 							<th>Farba</th>
-							<th>Číslo známky</th>
+							<th>Evidenčné číslo psa (číslo známky)</th>
 						</tr>
 						<xsl:apply-templates select="Dog"/>
 					</table>
