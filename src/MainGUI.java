@@ -115,7 +115,7 @@ public class MainGUI {
 		p.put("text.year", "Year");
 		datePanel = new JDatePanelImpl(model, p);
 		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		datePicker.setBounds(224, 330, 260, 87);
+		datePicker.setBounds(155, 325, 260, 87);
 
 		frame.getContentPane().add(datePicker);
 
@@ -219,7 +219,7 @@ public class MainGUI {
 
 		txtCity = new JTextField();
 		txtCity.setText("Bratislava");
-		txtCity.setBounds(20, 330, 103, 20);
+		txtCity.setBounds(7, 327, 103, 20);
 		frame.getContentPane().add(txtCity);
 		txtCity.setColumns(10);
 		
@@ -232,7 +232,7 @@ public class MainGUI {
 		frame.getContentPane().add(lblKontakt);
 		
 		JLabel lblNewLabel = new JLabel("d\u0148a");
-		lblNewLabel.setBounds(151, 330, 46, 14);
+		lblNewLabel.setBounds(120, 330, 46, 14);
 		frame.getContentPane().add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("Zoznam psov:");
