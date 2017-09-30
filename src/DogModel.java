@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 public class DogModel extends AbstractTableModel {
 
 private static final long serialVersionUID = 1L;
-private static final String[] columnNames = { "Datum narodenia", "Meno", "Plemeno", "Pohlavie", "Farba", "Evidenèné èíslo psa (èíslo známky)"};
+private static final String[] columnNames = { "Datum narodenia", "Meno", "Plemeno", "Pohlavie", "Farba", "Evidenèné èíslo"};
 private ArrayList<Dog> dogs;
 
 public ArrayList<Dog> getDogs() {

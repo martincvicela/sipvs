@@ -1,5 +1,6 @@
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 
 class DateLabelFormatter extends AbstractFormatter {
 
@@ -118,11 +121,18 @@ public class MainGUI {
 		datePicker.setBounds(155, 325, 260, 87);
 
 		frame.getContentPane().add(datePicker);
+		
+		JLabel lbl_NameAndSurname = new JLabel("Obchodn\u00E9 meno / meno a priezvisko vlastn\u00EDka (dr\u017Eite\u013Ea) psa:");
+		Font f = lbl_NameAndSurname.getFont();
+		lbl_NameAndSurname.setBounds(10, 47, 360, 14);
+		lbl_NameAndSurname.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+		frame.getContentPane().add(lbl_NameAndSurname);
 
 		table = new JTable();
 		modeldog.fireTableDataChanged();
-
 		table.setModel(modeldog);
+		JTableHeader header = table.getTableHeader();
+		header.setFont(f.deriveFont(Font.BOLD));
 
 		JScrollPane scroll = new JScrollPane(table);
 		scroll.setBounds(7, 185, 666, 102);
@@ -160,10 +170,6 @@ public class MainGUI {
 		frame.getContentPane().add(txtName);
 		txtName.setColumns(10);
 
-		JLabel lbl_NameAndSurname = new JLabel("Obchodn\u00E9 meno / meno a priezvisko vlastn\u00EDka (dr\u017Eite\u013Ea) psa:");
-		lbl_NameAndSurname.setBounds(10, 47, 360, 14);
-		frame.getContentPane().add(lbl_NameAndSurname);
-
 		txtEmail = new JTextField();
 		txtEmail.setText("chuck.norris@gmail.com");
 		txtEmail.setBounds(216, 133, 198, 20);
@@ -172,10 +178,12 @@ public class MainGUI {
 
 		JLabel lbl_Email = new JLabel("e-mail");
 		lbl_Email.setBounds(129, 136, 77, 14);
+		lbl_Email.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lbl_Email);
 
 		JLabel lbl_telephoneNo = new JLabel("telef\u00F3n");
 		lbl_telephoneNo.setBounds(129, 94, 77, 14);
+		lbl_telephoneNo.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lbl_telephoneNo);
 
 		textField_telephone = new JTextField();
@@ -229,14 +237,17 @@ public class MainGUI {
 		
 		JLabel lblKontakt = new JLabel("Kontakt: ");
 		lblKontakt.setBounds(10, 94, 71, 14);
+		lblKontakt.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblKontakt);
 		
 		JLabel lblNewLabel = new JLabel("d\u0148a");
 		lblNewLabel.setBounds(120, 330, 46, 14);
+		lblNewLabel.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("Zoznam psov:");
 		lblNewLabel_1.setBounds(7, 160, 111, 14);
+		lblNewLabel_1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel_1);
 	}
 }
