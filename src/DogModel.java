@@ -29,6 +29,17 @@ public void addRow(Dog rowData)
 	dogs.add(rowData);
 }
 
+public Dog getDogAtIndex(int index)
+{
+	return dogs.get(index);
+}
+
+public void removeRowAtIndex(int index)
+{
+	dogs.remove(index);
+}
+
+
 @Override
 public int getColumnCount() {
     // TODO Auto-generated method stub

@@ -151,7 +151,7 @@ public class MainGUI {
 				modeldog.fireTableDataChanged();
 			}
 		});
-		btnAddDog.setBounds(584, 292, 89, 23);
+		btnAddDog.setBounds(584, 291, 89, 23);
 		frame.getContentPane().add(btnAddDog);
 
 		JButton btn_SaveXml = new JButton("Ulo\u017E XML");
@@ -249,5 +249,25 @@ public class MainGUI {
 		lblNewLabel_1.setBounds(7, 160, 111, 14);
 		lblNewLabel_1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel_1);
+		
+		JButton buttonRemoveSelectedDog = new JButton("-");
+		buttonRemoveSelectedDog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try
+				{
+					int dialogResult = JOptionPane.showConfirmDialog (null, "Prajete si odobrat psa s evidenèným èíslom: " + modeldog.getDogAtIndex(table.getSelectedRow()).eNumber,null,JOptionPane.YES_NO_OPTION);
+					if(dialogResult == JOptionPane.YES_OPTION){
+						modeldog.removeRowAtIndex(table.getSelectedRow());
+						modeldog.fireTableDataChanged();
+					}
+				}
+				catch (Exception e)
+				{
+					JOptionPane.showMessageDialog(null, "Zrejme ste nevybrali z ponuky psov." ,  "Zrejme ste nevybrali z ponuky", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		buttonRemoveSelectedDog.setBounds(481, 291, 89, 23);
+		frame.getContentPane().add(buttonRemoveSelectedDog);
 	}
 }
