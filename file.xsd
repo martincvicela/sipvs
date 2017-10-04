@@ -37,6 +37,7 @@
 		<xs:sequence>
 			<xs:element name="BirthDate" type="xs:date"/>
 			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="EvidenceNumber" type="xs:integer"/>
 		</xs:sequence>
 		<xs:attribute name="Breed" type="xs:string" use="required"/>
 		<xs:attribute name="Gender" type="GenderType" use="required"/>

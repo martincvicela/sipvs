@@ -61,6 +61,7 @@ public class MainGUI {
 	private DogModel modeldog = new DogModel();
 	JDatePanelImpl datePanel;
 	JDatePickerImpl datePicker;
+
 	/**
 	 * Launch the application.
 	 */
@@ -83,13 +84,12 @@ public class MainGUI {
 	public MainGUI() {
 		initialize();
 	}
-	
+
 	/**
 	 * Creates DogEvidenceRecordfrom GUI
 	 */
-	public DogEvidenceRecord getDogEvidenceRecordFromGUI()
-	{
-		DogEvidenceRecord record= new DogEvidenceRecord();
+	public DogEvidenceRecord getDogEvidenceRecordFromGUI() {
+		DogEvidenceRecord record = new DogEvidenceRecord();
 		record.dogs = modeldog.getDogs();
 		record.requestDateAll = (Date) datePicker.getModel().getValue();
 		record.name = txtName.getText();
@@ -121,8 +121,9 @@ public class MainGUI {
 		datePicker.setBounds(155, 325, 260, 87);
 
 		frame.getContentPane().add(datePicker);
-		
-		JLabel lbl_NameAndSurname = new JLabel("Obchodn\u00E9 meno / meno a priezvisko vlastn\u00EDka (dr\u017Eite\u013Ea) psa:");
+
+		JLabel lbl_NameAndSurname = new JLabel(
+				"Obchodn\u00E9 meno / meno a priezvisko vlastn\u00EDka (dr\u017Eite\u013Ea) psa:");
 		Font f = lbl_NameAndSurname.getFont();
 		lbl_NameAndSurname.setBounds(10, 47, 360, 14);
 		lbl_NameAndSurname.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
@@ -195,7 +196,10 @@ public class MainGUI {
 		JButton btn_ValidateXml = new JButton("Validuj Xml");
 		btn_ValidateXml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//e.g. DogEvidenceRecord record = getDogEvidenceRecordFromGUI();
+				Validate XMLValidator = new Validate();
+				File xml = new File("file.xml");
+				File xsd = new File("file.xsd");
+				System.out.println(XMLValidator.validateXML(xml, xsd));
 			}
 		});
 		btn_ValidateXml.setBounds(10, 473, 108, 23);
@@ -205,21 +209,20 @@ public class MainGUI {
 		btn_TransformToHtml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!Desktop.isDesktopSupported()) {
-		            System.err.println("Desktop not supported!");
-		            System.exit(-1);
-		        }
+					System.err.println("Desktop not supported!");
+					System.exit(-1);
+				}
 
-		        Desktop desktop = Desktop.getDesktop();
-		        File file = new File("file.xml");
+				Desktop desktop = Desktop.getDesktop();
+				File file = new File("file.xml");
 
-		        if (desktop.isSupported(Desktop.Action.OPEN)) {
-		            try {
-		                desktop.open(file);
-		            }
-		            catch (IOException ioe) {
-		                System.err.println("Unable to open: " + file.getName());
-		            }
-		        }
+				if (desktop.isSupported(Desktop.Action.OPEN)) {
+					try {
+						desktop.open(file);
+					} catch (IOException ioe) {
+						System.err.println("Unable to open: " + file.getName());
+					}
+				}
 			}
 		});
 		btn_TransformToHtml.setBounds(128, 473, 136, 23);
@@ -230,40 +233,41 @@ public class MainGUI {
 		txtCity.setBounds(7, 327, 103, 20);
 		frame.getContentPane().add(txtCity);
 		txtCity.setColumns(10);
-		
+
 		JLabel lblPrihlseniePsaDo = new JLabel("Prihl\u00E1senie psov do evidencie");
 		lblPrihlseniePsaDo.setBounds(282, 11, 171, 14);
 		frame.getContentPane().add(lblPrihlseniePsaDo);
-		
+
 		JLabel lblKontakt = new JLabel("Kontakt: ");
 		lblKontakt.setBounds(10, 94, 71, 14);
 		lblKontakt.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblKontakt);
-		
+
 		JLabel lblNewLabel = new JLabel("d\u0148a");
 		lblNewLabel.setBounds(120, 330, 46, 14);
 		lblNewLabel.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel);
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Zoznam psov:");
 		lblNewLabel_1.setBounds(7, 160, 111, 14);
 		lblNewLabel_1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel_1);
-		
+
 		JButton buttonRemoveSelectedDog = new JButton("-");
 		buttonRemoveSelectedDog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try
-				{
-					int dialogResult = JOptionPane.showConfirmDialog (null, "Prajete si odobrat psa s evidenèným èíslom: " + modeldog.getDogAtIndex(table.getSelectedRow()).eNumber,null,JOptionPane.YES_NO_OPTION);
-					if(dialogResult == JOptionPane.YES_OPTION){
+				try {
+					int dialogResult = JOptionPane.showConfirmDialog(null,
+							"Prajete si odobrat psa s evidenèným èíslom: "
+									+ modeldog.getDogAtIndex(table.getSelectedRow()).eNumber,
+							null, JOptionPane.YES_NO_OPTION);
+					if (dialogResult == JOptionPane.YES_OPTION) {
 						modeldog.removeRowAtIndex(table.getSelectedRow());
 						modeldog.fireTableDataChanged();
 					}
-				}
-				catch (Exception e)
-				{
-					JOptionPane.showMessageDialog(null, "Zrejme ste nevybrali z ponuky psov." ,  "Zrejme ste nevybrali z ponuky", JOptionPane.ERROR_MESSAGE);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Zrejme ste nevybrali z ponuky psov.",
+							"Zrejme ste nevybrali z ponuky", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
