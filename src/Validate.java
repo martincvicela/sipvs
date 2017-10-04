@@ -13,7 +13,7 @@ public class Validate {
 	
 	}
 	
-	public boolean validateXML(File xml, File xsd)
+	public String validateXML(File xml, File xsd)
 	{
 	    try
 	    {
@@ -22,11 +22,12 @@ public class Validate {
 	        Schema schema = factory.newSchema(new StreamSource(xsd));
 	        Validator validator = schema.newValidator();
 	        validator.validate(new StreamSource(xml));
-	        return true;
+	        return "XML je validne";
 	    }
 	    catch(Exception ex)
 	    {
-	        return false;
+	    	System.out.println(ex);
+	        return "Nevalidne XML: " + ex;
 	    }
 	}
 }
