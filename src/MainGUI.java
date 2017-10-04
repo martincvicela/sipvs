@@ -104,7 +104,7 @@ public class MainGUI {
 	private void initialize() {
 		frame = new JFrame();
 		frame.getContentPane().setEnabled(false);
-		frame.setBounds(100, 100, 715, 547);
+		frame.setBounds(100, 100, 771, 531);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -118,14 +118,14 @@ public class MainGUI {
 		p.put("text.year", "Year");
 		datePanel = new JDatePanelImpl(model, p);
 		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		datePicker.setBounds(155, 325, 260, 87);
+		datePicker.setBounds(196, 325, 260, 87);
 
 		frame.getContentPane().add(datePicker);
 
 		JLabel lbl_NameAndSurname = new JLabel(
 				"Obchodn\u00E9 meno / meno a priezvisko vlastn\u00EDka (dr\u017Eite\u013Ea) psa:");
 		Font f = lbl_NameAndSurname.getFont();
-		lbl_NameAndSurname.setBounds(10, 47, 360, 14);
+		lbl_NameAndSurname.setBounds(51, 47, 360, 14);
 		lbl_NameAndSurname.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lbl_NameAndSurname);
 
@@ -136,7 +136,7 @@ public class MainGUI {
 		header.setFont(f.deriveFont(Font.BOLD));
 
 		JScrollPane scroll = new JScrollPane(table);
-		scroll.setBounds(7, 185, 666, 102);
+		scroll.setBounds(48, 185, 666, 102);
 		frame.getContentPane().add(scroll);
 
 		JButton btnAddDog = new JButton("+");
@@ -152,7 +152,7 @@ public class MainGUI {
 				modeldog.fireTableDataChanged();
 			}
 		});
-		btnAddDog.setBounds(584, 291, 89, 23);
+		btnAddDog.setBounds(625, 291, 89, 23);
 		frame.getContentPane().add(btnAddDog);
 
 		JButton btn_SaveXml = new JButton("Ulo\u017E XML");
@@ -162,34 +162,34 @@ public class MainGUI {
 				ConvertDogRecordToXml convert = new ConvertDogRecordToXml(record);
 			}
 		});
-		btn_SaveXml.setBounds(573, 473, 103, 23);
+		btn_SaveXml.setBounds(194, 441, 103, 23);
 		frame.getContentPane().add(btn_SaveXml);
 
 		txtName = new JTextField();
 		txtName.setText("Chuck Norris");
-		txtName.setBounds(380, 44, 296, 20);
+		txtName.setBounds(386, 44, 296, 20);
 		frame.getContentPane().add(txtName);
 		txtName.setColumns(10);
 
 		txtEmail = new JTextField();
 		txtEmail.setText("chuck.norris@gmail.com");
-		txtEmail.setBounds(216, 133, 198, 20);
+		txtEmail.setBounds(175, 136, 198, 20);
 		frame.getContentPane().add(txtEmail);
 		txtEmail.setColumns(10);
 
-		JLabel lbl_Email = new JLabel("e-mail");
-		lbl_Email.setBounds(129, 136, 77, 14);
+		JLabel lbl_Email = new JLabel("e-mail:");
+		lbl_Email.setBounds(132, 139, 77, 14);
 		lbl_Email.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lbl_Email);
 
-		JLabel lbl_telephoneNo = new JLabel("telef\u00F3n");
-		lbl_telephoneNo.setBounds(129, 94, 77, 14);
+		JLabel lbl_telephoneNo = new JLabel("telef\u00F3n:");
+		lbl_telephoneNo.setBounds(132, 97, 77, 14);
 		lbl_telephoneNo.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lbl_telephoneNo);
 
 		textField_telephone = new JTextField();
 		textField_telephone.setText("0901 123 456");
-		textField_telephone.setBounds(216, 91, 198, 20);
+		textField_telephone.setBounds(175, 94, 198, 20);
 		frame.getContentPane().add(textField_telephone);
 		textField_telephone.setColumns(10);
 
@@ -199,10 +199,10 @@ public class MainGUI {
 				Validate XMLValidator = new Validate();
 				File xml = new File("file.xml");
 				File xsd = new File("file.xsd");
-				System.out.println(XMLValidator.validateXML(xml, xsd));
+				JOptionPane.showMessageDialog(null, XMLValidator.validateXML(xml, xsd));
 			}
 		});
-		btn_ValidateXml.setBounds(10, 473, 108, 23);
+		btn_ValidateXml.setBounds(323, 441, 108, 23);
 		frame.getContentPane().add(btn_ValidateXml);
 
 		JButton btn_TransformToHtml = new JButton("Zobraz formulár");
@@ -225,31 +225,31 @@ public class MainGUI {
 				}
 			}
 		});
-		btn_TransformToHtml.setBounds(128, 473, 136, 23);
+		btn_TransformToHtml.setBounds(460, 441, 136, 23);
 		frame.getContentPane().add(btn_TransformToHtml);
 
 		txtCity = new JTextField();
 		txtCity.setText("Bratislava");
-		txtCity.setBounds(7, 327, 103, 20);
+		txtCity.setBounds(48, 327, 103, 20);
 		frame.getContentPane().add(txtCity);
 		txtCity.setColumns(10);
 
 		JLabel lblPrihlseniePsaDo = new JLabel("Prihl\u00E1senie psov do evidencie");
-		lblPrihlseniePsaDo.setBounds(282, 11, 171, 14);
+		lblPrihlseniePsaDo.setBounds(323, 11, 171, 14);
 		frame.getContentPane().add(lblPrihlseniePsaDo);
 
 		JLabel lblKontakt = new JLabel("Kontakt: ");
-		lblKontakt.setBounds(10, 94, 71, 14);
+		lblKontakt.setBounds(51, 94, 71, 14);
 		lblKontakt.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblKontakt);
 
 		JLabel lblNewLabel = new JLabel("d\u0148a");
-		lblNewLabel.setBounds(120, 330, 46, 14);
+		lblNewLabel.setBounds(161, 330, 46, 14);
 		lblNewLabel.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel);
 
 		JLabel lblNewLabel_1 = new JLabel("Zoznam psov:");
-		lblNewLabel_1.setBounds(7, 160, 111, 14);
+		lblNewLabel_1.setBounds(48, 160, 111, 14);
 		lblNewLabel_1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
 		frame.getContentPane().add(lblNewLabel_1);
 
@@ -271,7 +271,7 @@ public class MainGUI {
 				}
 			}
 		});
-		buttonRemoveSelectedDog.setBounds(481, 291, 89, 23);
+		buttonRemoveSelectedDog.setBounds(522, 291, 89, 23);
 		frame.getContentPane().add(buttonRemoveSelectedDog);
 	}
 }
