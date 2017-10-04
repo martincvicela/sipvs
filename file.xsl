@@ -17,7 +17,7 @@
 					<xsl:call-template name="ContactInfo"/>
 					<div>Zoznam psov:</div>
 					<table style="margin-bottom:2%; margin-right:5%;" border="1">
-						<tr bgcolor="#d3d3d3">
+						<tr bgcolor="#f2f2f2">
 							<th>Dátum narodenia</th>
 							<th>Meno</th>
 							<th>Plemeno</th>
