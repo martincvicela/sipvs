@@ -9,7 +9,7 @@
 					margin-bottom: 2%;
 				} 
 			</style>
-			<div style="margin-left:10%; margin-right:45%; border:solid; border-width:1px">
+			<div style="margin-left:22%; margin-right:22%; border:solid; border-width:1px">
 				<div style="margin-left:5%;">
 					<div>
 						<h4 style="text-align:center;">Prihlásenie psov do evidencie</h4>
@@ -36,20 +36,20 @@
 
 <xsl:template match="Dog">
 	<tr>
-		<td><xsl:value-of select="BirthDate"/></td>
-		<td><xsl:value-of select="Name"/></td>
-		<td><xsl:value-of select="attribute::Breed"/></td>
-		<td><xsl:value-of select="attribute::Colour"/></td>
-		<td><xsl:value-of select="attribute::Gender"/></td>
-		<td><xsl:value-of select="EvidenceNumber"/></td>
+		<td width="7%"><xsl:value-of select="BirthDate"/></td>
+		<td width="7%"><xsl:value-of select="Name"/></td>
+		<td width="7%"><xsl:value-of select="attribute::Breed"/></td>
+		<td width="7%"><xsl:value-of select="attribute::Colour"/></td>
+		<td width="7%"><xsl:value-of select="attribute::Gender"/></td>
+		<td width="7%"><xsl:value-of select="EvidenceNumber"/></td>
 	</tr>
 </xsl:template>
 
 <xsl:template name="ContactInfo">
 	<div>Obchodné meno / meno a priezvisko vlastníka (držiteľa) psa: <xsl:value-of select="Name"/></div>
 	<div>
-		<div>Kontakt: <span style="padding:30px"></span> telefón <span style="padding:35px"></span><xsl:value-of select="//TelephoneNumber"/></div>	
-		<div style="margin-left:120px;"> e-mail <span style="padding:36px"></span> <xsl:value-of select="//Email"/></div>
+		<div>Kontakt: <span style="padding:25px"></span> telefón: <xsl:value-of select="//TelephoneNumber"/></div>	
+		<div style="margin-left:110px;"> e-mail: <xsl:value-of select="//Email"/></div>
 	</div>
 </xsl:template>
 

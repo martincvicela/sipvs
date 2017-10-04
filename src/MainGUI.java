@@ -193,7 +193,7 @@ public class MainGUI {
 		frame.getContentPane().add(textField_telephone);
 		textField_telephone.setColumns(10);
 
-		JButton btn_ValidateXml = new JButton("Validuj Xml");
+		JButton btn_ValidateXml = new JButton("Validuj XML");
 		btn_ValidateXml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Validate XMLValidator = new Validate();
