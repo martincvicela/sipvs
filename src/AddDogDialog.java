@@ -69,7 +69,7 @@ public class AddDogDialog extends JDialog {
 						dog.name = textField_Name.getText();
 						dog.birthDateWithTime = (Date) datePicker.getModel().getValue();
 						dog.breed = textField_Breed.getText();
-						dog.eNumber =  Integer.parseInt(textField_EvidenceNo.getText().replaceAll(",", ""));
+						dog.eNumber =  Integer.parseInt(textField_EvidenceNo.getText());
 						dog.colour = textField_Colour.getText();
 						dog.gender = textField_Gender.getText();
 						add = true;
@@ -145,12 +145,14 @@ public class AddDogDialog extends JDialog {
 		contentPanel.add(lblNewLabel_3);
 		
 		NumberFormat integerFormat = NumberFormat.getIntegerInstance();
+		integerFormat.setGroupingUsed(false);
 		NumberFormatter numberFormatter = new NumberFormatter(integerFormat);
 		numberFormatter.setValueClass(Integer.class); //optional, ensures you will always get a long value
 		numberFormatter.setAllowsInvalid(false); //this is the key!!
 		numberFormatter.setMinimum(0); //Optional
 		textField_EvidenceNo = new JFormattedTextField (numberFormatter);
 		textField_EvidenceNo.setBounds(157, 229, 171, 20);
+		
 		contentPanel.add(textField_EvidenceNo);
 		textField_EvidenceNo.setColumns(10);
 		
