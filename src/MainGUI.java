@@ -110,7 +110,6 @@ public class MainGUI {
 		frame.getContentPane().setLayout(null);
 
 		UtilDateModel model = new UtilDateModel();
-		model.setDate(2017, 9, 3);
 		model.setSelected(true);
 
 		Properties p = new Properties();

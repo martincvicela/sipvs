@@ -20,7 +20,8 @@ public class DogEvidenceRecord {
 		this.contact = argRecord.contact;
 		this.dogs = argRecord.dogs;
 		this.city = argRecord.city;
-		this.requestDateAll = argRecord.requestDateAll;
+		DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
+		this.requestDate= outputFormatter.format(argRecord.requestDateAll);
 	}
 
 	@XmlElement(name = "Name")

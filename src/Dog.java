@@ -12,7 +12,7 @@ public class Dog{
 	Date birthDateWithTime = new Date();
 	DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
 	@XmlElement(name = "BirthDate")
-	String birthDate= outputFormatter.format(birthDateWithTime);
+	String birthDate = outputFormatter.format(birthDateWithTime);
 	@XmlElement(name = "Name")
 	public String name = "Rex";
 	@XmlAttribute(name = "Breed")
@@ -24,12 +24,14 @@ public class Dog{
 	@XmlElement(name = "EvidenceNumber")
 	public Integer eNumber = 15467;
 	
-	public Dog(String colour, String name, String breed, Integer eNumber) {
+	public Dog(String colour, String name, String breed, Integer eNumber, Date bDate) {
 		super();
 		this.colour = colour;
 		this.name = name;
 		this.breed = breed;
 		this.eNumber = eNumber;
+		DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
+		this.birthDate = outputFormatter.format(bDate);
 	}
 	public Dog() {
 		super();

@@ -14,7 +14,9 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -74,7 +76,8 @@ public class AddDogDialog extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dog.name = textField_Name.getText();
-						dog.birthDateWithTime = (Date) datePicker.getModel().getValue();
+						DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
+						dog.birthDate = outputFormatter.format((Date) datePicker.getModel().getValue());
 						dog.breed = textField_Breed.getText();
 						dog.eNumber =  Integer.parseInt(textField_EvidenceNo.getText());
 						dog.colour = textField_Colour.getText();
@@ -101,7 +104,6 @@ public class AddDogDialog extends JDialog {
 		}
 		
 		UtilDateModel model = new UtilDateModel();
-		model.setDate(2017, 9, 3);
 		model.setSelected(true);
 
 		Properties p = new Properties();
