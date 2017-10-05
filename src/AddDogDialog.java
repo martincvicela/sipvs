@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
+import javax.swing.JComboBox;
 
 public class AddDogDialog extends JDialog {
 
@@ -30,9 +31,9 @@ public class AddDogDialog extends JDialog {
 	JDatePickerImpl datePicker;
 	private JTextField textField_Name;
 	private JTextField textField_Breed;
-	private JTextField textField_Gender;
 	private JTextField textField_Colour;
 	private JFormattedTextField textField_EvidenceNo;
+	private JComboBox comboBox;
 
 	/**
 	 * Launch the application.
@@ -71,7 +72,7 @@ public class AddDogDialog extends JDialog {
 						dog.breed = textField_Breed.getText();
 						dog.eNumber =  Integer.parseInt(textField_EvidenceNo.getText());
 						dog.colour = textField_Colour.getText();
-						dog.gender = textField_Gender.getText();
+						dog.gender = (String) comboBox.getSelectedItem();
 						add = true;
 						dispose();
 					}
@@ -130,11 +131,6 @@ public class AddDogDialog extends JDialog {
 		contentPanel.add(textField_Breed);
 		textField_Breed.setColumns(10);
 		
-		textField_Gender = new JTextField();
-		textField_Gender.setBounds(157, 143, 171, 20);
-		contentPanel.add(textField_Gender);
-		textField_Gender.setColumns(10);
-		
 		textField_Colour = new JTextField();
 		textField_Colour.setBounds(157, 186, 171, 20);
 		contentPanel.add(textField_Colour);
@@ -163,5 +159,10 @@ public class AddDogDialog extends JDialog {
 		JLabel lblNewLabel_5 = new JLabel("Datum narodenia psa");
 		lblNewLabel_5.setBounds(17, 20, 130, 14);
 		contentPanel.add(lblNewLabel_5);
+		
+		String[] genderStrings = { "pes", "fena" };
+		JComboBox comboBox = new JComboBox(genderStrings);
+		comboBox.setBounds(155, 141, 173, 25);
+		contentPanel.add(comboBox);
 	}
 }
