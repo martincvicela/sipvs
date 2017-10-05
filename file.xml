@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?xml-stylesheet type='text/xsl' href="file.xsl" ?>
 <DogEvidenceRecord>
-    <Name>Chuck Norris</Name>
+    <Name>Ivan Gulis</Name>
     <Contact>
-        <TelephoneNumber>0901 123 456s</TelephoneNumber>
-        <Email>chuck.norris@gmail.com</Email>
+        <TelephoneNumber>0911111111</TelephoneNumber>
+        <Email>ja@ja.com</Email>
     </Contact>
-    <Dog Breed="Labrador Retriever" Gender="pes" Colour="primalex">
+    <Dog Breed="Zruda" Gender="pes" Colour="leniva">
         <BirthDate>2017-10-05</BirthDate>
-        <Name>Jawa</Name>
-        <EvidenceNumber>14789</EvidenceNumber>
-    </Dog>
-    <Dog Breed="German Shepherd" Gender="pes" Colour="pink">
-        <BirthDate>2017-10-05</BirthDate>
-        <Name>Rex</Name>
-        <EvidenceNumber>15467</EvidenceNumber>
-    </Dog>
-    <Dog Breed="exception throw" Gender="pes" Colour="Belinka">
-        <BirthDate>2017-10-05</BirthDate>
-        <Name>Trabant</Name>
-        <EvidenceNumber>654</EvidenceNumber>
+        <Name>Mrnavá</Name>
+        <EvidenceNumber>14556</EvidenceNumber>
     </Dog>
     <City>Bratislava</City>
     <RequestDate>2017-10-05</RequestDate>

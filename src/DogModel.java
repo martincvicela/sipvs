@@ -19,9 +19,6 @@ public void setDogs(ArrayList<Dog> dogs) {
 
 public DogModel(){
     dogs =  new ArrayList<Dog>();
-    dogs.add(new Dog("primalex", "Jawa", "Labrador Retriever", 14789));
-    dogs.add(new Dog());
-    dogs.add(new Dog("Belinka", "Trabant", "exception throw", 654));
 }
 
 public void addRow(Dog rowData)

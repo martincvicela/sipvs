@@ -166,13 +166,13 @@ public class MainGUI {
 		frame.getContentPane().add(btn_SaveXml);
 
 		txtName = new JTextField();
-		txtName.setText("Chuck Norris");
+		txtName.setText("");
 		txtName.setBounds(386, 44, 296, 20);
 		frame.getContentPane().add(txtName);
 		txtName.setColumns(10);
 
 		txtEmail = new JTextField();
-		txtEmail.setText("chuck.norris@gmail.com");
+		txtEmail.setText("@");
 		txtEmail.setBounds(175, 136, 198, 20);
 		frame.getContentPane().add(txtEmail);
 		txtEmail.setColumns(10);
@@ -188,7 +188,7 @@ public class MainGUI {
 		frame.getContentPane().add(lbl_telephoneNo);
 
 		textField_telephone = new JTextField();
-		textField_telephone.setText("0901 123 456");
+		textField_telephone.setText("");
 		textField_telephone.setBounds(175, 94, 198, 20);
 		frame.getContentPane().add(textField_telephone);
 		textField_telephone.setColumns(10);

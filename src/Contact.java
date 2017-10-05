@@ -12,7 +12,7 @@ public class Contact {
 		this.email = email;
 	}
 	@XmlElement(name = "TelephoneNumber")
-	public String telephoneNumber = "0905 123  456";
+	public String telephoneNumber = "";
 	@XmlElement(name = "Email")
-	public String email = "jozko [at] mrkvicka";
+	public String email = "";
 }

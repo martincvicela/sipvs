@@ -34,6 +34,7 @@ public class AddDogDialog extends JDialog {
 	private JTextField textField_Colour;
 	private JFormattedTextField textField_EvidenceNo;
 	private JComboBox comboBox;
+	private SpringLayout springLayout;
 
 	/**
 	 * Launch the application.
@@ -58,6 +59,11 @@ public class AddDogDialog extends JDialog {
 		setBounds(100, 100, 450, 335);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
+		String[] genderStrings = { "pes", "fena" };
+		JComboBox comboBox = new JComboBox(genderStrings);
+		comboBox.setBounds(155, 141, 173, 25);
+		contentPanel.add(comboBox);
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		{
 			JPanel buttonPane = new JPanel();
@@ -105,8 +111,9 @@ public class AddDogDialog extends JDialog {
 		datePanel = new JDatePanelImpl(model, p);
 		contentPanel.setLayout(null);
 		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		SpringLayout springLayout = (SpringLayout) datePicker.getLayout();
-		datePicker.setBounds(155, 20, 190, 20);
+		SpringLayout springLayout_1 = (SpringLayout) datePicker.getLayout();
+		springLayout_1.putConstraint(SpringLayout.SOUTH, datePicker.getJFormattedTextField(), 0, SpringLayout.SOUTH, datePicker);
+		datePicker.setBounds(155, 16, 190, 30);
 		contentPanel.add(datePicker);
 		
 		JLabel lblNewLabel = new JLabel("Pohlavie psa");
@@ -159,10 +166,5 @@ public class AddDogDialog extends JDialog {
 		JLabel lblNewLabel_5 = new JLabel("Datum narodenia psa");
 		lblNewLabel_5.setBounds(17, 20, 130, 14);
 		contentPanel.add(lblNewLabel_5);
-		
-		String[] genderStrings = { "pes", "fena" };
-		JComboBox comboBox = new JComboBox(genderStrings);
-		comboBox.setBounds(155, 141, 173, 25);
-		contentPanel.add(comboBox);
 	}
 }

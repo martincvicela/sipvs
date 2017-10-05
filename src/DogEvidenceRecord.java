@@ -26,7 +26,7 @@ public class DogEvidenceRecord {
 	@XmlElement(name = "Name")
 	public String name;
 	@XmlElement(name = "Contact")
-	Contact contact = new Contact("sdfg", "asdf");
+	Contact contact = new Contact();
 	@XmlElement(name = "Dog")
 	public ArrayList<Dog> dogs = new ArrayList<Dog>();
 	@XmlElement(name = "City")
