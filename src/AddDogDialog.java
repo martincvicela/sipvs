@@ -79,7 +79,10 @@ public class AddDogDialog extends JDialog {
 						DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
 						dog.birthDate = outputFormatter.format((Date) datePicker.getModel().getValue());
 						dog.breed = textField_Breed.getText();
-						dog.eNumber =  Integer.parseInt(textField_EvidenceNo.getText());
+						if (textField_EvidenceNo.getText().equals(""))
+							dog.eNumber = 0;
+						else 
+							dog.eNumber = Integer.parseInt(textField_EvidenceNo.getText());
 						dog.colour = textField_Colour.getText();
 						dog.gender = (String) comboBox.getSelectedItem();
 						add = true;

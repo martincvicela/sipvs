@@ -3,9 +3,14 @@
 <DogEvidenceRecord>
     <Name></Name>
     <Contact>
-        <TelephoneNumber></TelephoneNumber>
+        <TelephoneNumber>99</TelephoneNumber>
         <Email>@</Email>
     </Contact>
+    <Dog Breed="" Gender="pes" Colour="">
+        <BirthDate>2017-10-17</BirthDate>
+        <Name></Name>
+        <EvidenceNumber>0</EvidenceNumber>
+    </Dog>
     <City>Bratislava</City>
-    <RequestDate>2017-10-19</RequestDate>
+    <RequestDate>2017-10-11</RequestDate>
 </DogEvidenceRecord>
