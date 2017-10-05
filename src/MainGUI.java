@@ -1,4 +1,5 @@
 import java.awt.Desktop;
+import java.awt.Dialog.ModalityType;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.text.DateFormat;
@@ -142,14 +143,13 @@ public class MainGUI {
 		JButton btnAddDog = new JButton("+");
 		btnAddDog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Date selectedDate = (Date) datePicker.getModel().getValue();
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // e.g.
-																	// MM/dd/yyyy
-																	// HH:mm:ss
-				String reportDate = df.format(selectedDate);
-				JOptionPane.showMessageDialog(null, "My Goodness, this is so beautiful" + reportDate);
-				modeldog.addRow(new Dog("black", "Rex", "German Shepherd", 9875));
-				modeldog.fireTableDataChanged();
+				AddDogDialog dialog = new AddDogDialog();
+				dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+				dialog.setVisible(true);
+				if(dialog.add) {
+					modeldog.addRow(dialog.dog);
+					modeldog.fireTableDataChanged();
+					}
 			}
 		});
 		btnAddDog.setBounds(625, 291, 89, 23);
