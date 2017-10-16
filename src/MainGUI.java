@@ -161,7 +161,7 @@ public class MainGUI {
 				ConvertDogRecordToXml convert = new ConvertDogRecordToXml(record);
 			}
 		});
-		btn_SaveXml.setBounds(194, 441, 103, 23);
+		btn_SaveXml.setBounds(92, 441, 103, 23);
 		frame.getContentPane().add(btn_SaveXml);
 
 		txtName = new JTextField();
@@ -201,7 +201,7 @@ public class MainGUI {
 				JOptionPane.showMessageDialog(null, XMLValidator.validateXML(xml, xsd));
 			}
 		});
-		btn_ValidateXml.setBounds(323, 441, 108, 23);
+		btn_ValidateXml.setBounds(221, 441, 108, 23);
 		frame.getContentPane().add(btn_ValidateXml);
 
 		JButton btn_TransformToHtml = new JButton("Zobraz formulár");
@@ -224,7 +224,7 @@ public class MainGUI {
 				}
 			}
 		});
-		btn_TransformToHtml.setBounds(460, 441, 136, 23);
+		btn_TransformToHtml.setBounds(358, 441, 136, 23);
 		frame.getContentPane().add(btn_TransformToHtml);
 
 		txtCity = new JTextField();
@@ -272,5 +272,14 @@ public class MainGUI {
 		});
 		buttonRemoveSelectedDog.setBounds(522, 291, 89, 23);
 		frame.getContentPane().add(buttonRemoveSelectedDog);
+		
+		JButton btnSign = new JButton("Podp\u00ED\u0161");
+		btnSign.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Signature.sign();
+			}
+		});
+		btnSign.setBounds(525, 441, 116, 23);
+		frame.getContentPane().add(btnSign);
 	}
 }
