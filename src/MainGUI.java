@@ -276,7 +276,12 @@ public class MainGUI {
 		JButton btnSign = new JButton("Podp\u00ED\u0161");
 		btnSign.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Signature.sign();
+				try {
+					Signature.sign();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnSign.setBounds(525, 441, 116, 23);

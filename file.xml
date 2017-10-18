@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?xml-stylesheet type='text/xsl' href="file.xsl" ?>
 <DogEvidenceRecord>
-    <Name></Name>
+    <Name>bvbbvbbv</Name>
     <Contact>
-        <TelephoneNumber>99</TelephoneNumber>
-        <Email>@</Email>
+        <TelephoneNumber>0954565789</TelephoneNumber>
+        <Email>vvgg@ggf.com</Email>
     </Contact>
-    <Dog Breed="" Gender="pes" Colour="">
-        <BirthDate>2017-10-17</BirthDate>
-        <Name></Name>
-        <EvidenceNumber>0</EvidenceNumber>
+    <Dog Breed="dfff" Gender="pes" Colour="dff">
+        <BirthDate>2017-10-18</BirthDate>
+        <Name>dffd</Name>
+        <EvidenceNumber>25</EvidenceNumber>
     </Dog>
     <City>Bratislava</City>
-    <RequestDate>2017-10-11</RequestDate>
+    <RequestDate>2017-10-18</RequestDate>
 </DogEvidenceRecord>

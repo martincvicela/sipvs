@@ -1,70 +1,33 @@
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
-
+import sk.ditec.zep.dsigner.xades.XadesSig;
 import sk.ditec.zep.dsigner.xades.plugin.DataObject;
 import sk.ditec.zep.dsigner.xades.plugins.xmlplugin.XmlPlugin;
 
-public class Signature {
 
-	static public InputStream getResourceAsStream(String name) {
-		String path = new File("resources", name).getPath();
-		InputStream is = AbstractTest.class.getResourceAsStream(path);
-		if (is == null) {
-			throw new RuntimeException("Nepodarilo sa otvorit zdroj: " + path);
-		}
-		return is;
-	}
-
-	static public String readResource(String name) throws IOException {
-		InputStream is = getResourceAsStream(name);
-		byte[] data = new byte[is.available()];
-		is.read(data);
-		is.close();
-		return new String(data, "UTF-8");
-	}
-
-	static public String readResourceAsBase64(String name) throws IOException {
-		InputStream is = getResourceAsStream(name);
-		byte[] data = new byte[is.available()];
-		is.read(data);
-		is.close();
-		String msg = Base64.encode(data);
-		return msg;
-
-	}
-
-	static public void writeFileFromBase64(String filename, String base64) throws IOException {
-		String path = new File(System.getProperty("user.home"), filename).getAbsolutePath();
-		FileOutputStream is = new FileOutputStream(path);
-		try {
-			is.write(Base64.decode(base64));
-		} catch (Base64DecodingException e) {
-			throw new RuntimeException(e);
-		} finally {
-			is.close();
-		}
-	}
+public class Signature extends AbstractSignature {
 	
-	static public void sign() {
+	static public void sign() throws IOException {
 		int rc;
 
-		final XadesSig dSigner = new XadesSig();
+	 XadesSig dSigner = new XadesSig();
 		dSigner.installLookAndFeel();
 		dSigner.installSwingLocalization();
 		dSigner.reset();
 		//dSigner.setLanguage("sk");
 
 		XmlPlugin xmlPlugin = new XmlPlugin();
-		DataObject xmlObject = xmlPlugin.createObject("XML1", "XML", readResource("xml/UI_26_vin_neobmedz/form.108.xml"),
-				readResource("xml/UI_26_vin_neobmedz/form.108.xsd"),
-				"http://www.egov.sk/mvsr/NEV/datatypes/Zapis/Ext/PodanieZiadostiOPrihlasenieImporteromSoZepUI.1.0.xsd", "http://www.example.com/xml/sb",
-				readResource("xml/UI_26_vin_neobmedz/form.108.sb.xslt"), "http://www.example.com/xml/sb");
+		DataObject xmlObject = xmlPlugin.createObject(
+				"XML1", 
+				"XML", 
+				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xml"),
+				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
+				"",
+				"http://www.w3.org/2001/XMLSchema",
+				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
+				"http://www.w3.org/1999/XSL/Transform");
 
+		System.out.println("Hello, World");
 		if (xmlObject == null) {
 			System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
 			return;

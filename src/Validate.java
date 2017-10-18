@@ -26,7 +26,6 @@ public class Validate {
 	    }
 	    catch(Exception ex)
 	    {
-	    	System.out.println(ex);
 	        return "Nevalidne XML: " + ex;
 	    }
 	}
