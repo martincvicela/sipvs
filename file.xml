@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?xml-stylesheet type='text/xsl' href="file.xsl" ?>
 <DogEvidenceRecord>
-    <Name>bvbbvbbv</Name>
+    <Name>Ivan Gulis&lt;s&gt;</Name>
     <Contact>
-        <TelephoneNumber>0954565789</TelephoneNumber>
-        <Email>vvgg@ggf.com</Email>
+        <TelephoneNumber>1123456789</TelephoneNumber>
+        <Email>a@a.sk</Email>
     </Contact>
-    <Dog Breed="dfff" Gender="pes" Colour="dff">
+    <Dog Breed="sdf" Gender="pes" Colour="sdf">
         <BirthDate>2017-10-18</BirthDate>
-        <Name>dffd</Name>
-        <EvidenceNumber>25</EvidenceNumber>
+        <Name>sdfsd</Name>
+        <EvidenceNumber>1548</EvidenceNumber>
     </Dog>
     <City>Bratislava</City>
     <RequestDate>2017-10-18</RequestDate>
