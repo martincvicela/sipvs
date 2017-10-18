@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<xsl:output method="html" version="4.0" encoding="UTF-8" indent="yes"/>
 
 <xsl:template match="/DogEvidenceRecord">
 	<html>
@@ -9,7 +10,7 @@
 					margin-bottom: 2%;
 				} 
 			</style>
-			<div style="margin-left:22%; margin-right:22%; border:solid; border-width:1px">
+			<div style="border:solid; border-width:1px">
 				<div style="margin-left:5%;">
 					<div>
 						<h4 style="text-align:center;">Prihlásenie psov do evidencie</h4>
