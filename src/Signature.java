@@ -18,7 +18,7 @@ public class Signature extends AbstractSignature {
 		//dSigner.setLanguage("sk");
 
 		XmlPlugin xmlPlugin = new XmlPlugin();
-		DataObject xmlObject = xmlPlugin.createObject(
+		DataObject xmlObject = xmlPlugin.createObject2(
 				"XML1", 
 				"XML", 
 				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xml"),
@@ -29,7 +29,8 @@ public class Signature extends AbstractSignature {
 				"http://www.w3.org/2001/XMLSchema",
 				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xsl"),
 				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
-				"http://www.w3.org/1999/XSL/Transform");
+				"http://www.w3.org/1999/XSL/Transform",
+				"HTML");
 
 		if (xmlObject == null) {
 			System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
