@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <?xml-stylesheet type='text/xsl' href="file.xsl" ?>
 <DogEvidenceRecord>
-    <Name>Ivan Gulis&lt;s&gt;</Name>
+    <Name>Martin Cvicela</Name>
     <Contact>
-        <TelephoneNumber>1123456789</TelephoneNumber>
-        <Email>a@a.sk</Email>
+        <TelephoneNumber>0915545790</TelephoneNumber>
+        <Email>mato155@gmail.com</Email>
     </Contact>
-    <Dog Breed="sdf" Gender="pes" Colour="sdf">
-        <BirthDate>2017-10-18</BirthDate>
-        <Name>sdfsd</Name>
-        <EvidenceNumber>1548</EvidenceNumber>
+    <Dog Breed="Labrador" Gender="pes" Colour="Biela">
+        <BirthDate>2017-10-19</BirthDate>
+        <Name>Deny</Name>
+        <EvidenceNumber>123456789</EvidenceNumber>
     </Dog>
     <City>Bratislava</City>
-    <RequestDate>2017-10-18</RequestDate>
+    <RequestDate>2017-10-19</RequestDate>
 </DogEvidenceRecord>

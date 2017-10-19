@@ -1,5 +1,8 @@
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import javax.swing.JOptionPane;
 
 import sk.ditec.zep.dsigner.xades.XadesSig;
 import sk.ditec.zep.dsigner.xades.plugin.DataObject;
@@ -34,12 +37,14 @@ public class Signature extends AbstractSignature {
 
 		if (xmlObject == null) {
 			System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
+			JOptionPane.showMessageDialog(null, xmlPlugin.getErrorMessage());
 			return;
 		}
 
 		rc = dSigner.addObject(xmlObject);
 		if (rc != 0) {
 			System.out.println("XadesSig.addObject() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
+			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
 		}
 
@@ -47,14 +52,14 @@ public class Signature extends AbstractSignature {
 				"dataEnvelopeURI", "dataEnvelopeDescr");
 		if (rc != 0) {
 			System.out.println("XadesSig.sign20() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
+			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
 		}		
 
 		System.out.println(dSigner.getSignedXmlWithEnvelope());
 		PrintWriter out = new PrintWriter("signedXml.xml");
 		out.println(dSigner.getSignedXmlWithEnvelope());
-		out.close();
-		
+		out.close();		
 	}
 	
 }
