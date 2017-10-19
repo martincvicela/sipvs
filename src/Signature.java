@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -22,59 +23,36 @@ public class Signature extends AbstractSignature {
 		  return text;
 		}
 	
-	static public void sign() throws IOException {
-		int rc;
-
+	static public void sign(List<String> documentNames) throws IOException {
+		int rc = -1;		
 	 XadesSig dSigner = new XadesSig();
 		dSigner.installLookAndFeel();
 		dSigner.installSwingLocalization();
 		dSigner.reset();
 		//dSigner.setLanguage("sk");
 
-		XmlPlugin xmlPlugin = new XmlPlugin();
-		DataObject xmlObject = xmlPlugin.createObject2(
-				"b", 
-				MainGUI.nazov, 
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xml"),
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xsd"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xml"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
-				"",
-				"http://www.w3.org/2001/XMLSchema",
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xsl"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
-				"http://www.w3.org/1999/XSL/Transform",
-				"HTML");
-
-		if (xmlObject == null) {
-			System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
-			JOptionPane.showMessageDialog(null, xmlPlugin.getErrorMessage());
-			return;
-		}
 		
-		DataObject xmlObject2 = xmlPlugin.createObject2(
-				"a", 
-				MainGUI.nazov, 
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xml"),
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xsd"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file2.xml"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
-				"",
-				"http://www.w3.org/2001/XMLSchema",
-				//readResource("C:/skola9/SIPVS/Git/sipvs/file.xsl"),
-				readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
-				"http://www.w3.org/1999/XSL/Transform",
-				"HTML");
+		for (int i = 0; i < documentNames.size(); i++) {
+			System.out.println(documentNames.get(i));
+			XmlPlugin xmlPlugin = new XmlPlugin();
+			DataObject xmlObject = xmlPlugin.createObject2(
+					documentNames.get(i).replaceAll("[.]", ""), 
+					MainGUI.nazov, 
+					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/" + documentNames.get(i)),
+					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
+					"",
+					"http://www.w3.org/2001/XMLSchema",
+					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
+					"http://www.w3.org/1999/XSL/Transform",
+					"HTML");
 
-		if (xmlObject2 == null) {
-			System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
-			JOptionPane.showMessageDialog(null, xmlPlugin.getErrorMessage());
-			return;
+			if (xmlObject == null) {
+				System.out.println("XMLPlugin.createObject() errorMessage=" + xmlPlugin.getErrorMessage());
+				JOptionPane.showMessageDialog(null, xmlPlugin.getErrorMessage());
+				return;
+			}
+			rc = dSigner.addObject(xmlObject);
 		}
-		
-		UUID randomID = UUID.randomUUID();
-		rc = dSigner.addObject(xmlObject);
-		rc = dSigner.addObject(xmlObject2);
 		
 		if (rc != 0) {
 			System.out.println("XadesSig.addObject() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());

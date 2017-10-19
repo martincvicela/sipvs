@@ -5,8 +5,10 @@ import java.awt.Font;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JFrame;
@@ -53,6 +55,7 @@ class DateLabelFormatter extends AbstractFormatter {
 
 public class MainGUI {
 
+	public static List<String> documentNames = new ArrayList<String>();
 	private JFrame frame;
 	private JTable table;
 	private JTextField txtName;
@@ -280,7 +283,7 @@ public class MainGUI {
 		btnSign.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Signature.sign();
+					Signature.sign(documentNames);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

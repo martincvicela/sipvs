@@ -10,7 +10,9 @@ public class ConvertDogRecordToXml {
 
 	  try {
 
-		File file = new File("file.xml");
+		String fileName = new String("file" + Math.random() + ".xml");
+		System.out.println(fileName);
+		File file = new File(fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(DogEvidenceRecord.class);
 		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
@@ -22,6 +24,8 @@ public class ConvertDogRecordToXml {
 		jaxbMarshaller.marshal(evidenceRecord, file);
 		jaxbMarshaller.marshal(evidenceRecord, System.out);
 
+		MainGUI.documentNames.add(fileName);
+		
 	      } catch (JAXBException e) {
 		e.printStackTrace();
 	      }
