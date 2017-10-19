@@ -62,6 +62,7 @@ public class MainGUI {
 	private DogModel modeldog = new DogModel();
 	JDatePanelImpl datePanel;
 	JDatePickerImpl datePicker;
+	public static String nazov = "";
 
 	/**
 	 * Launch the application.
@@ -234,6 +235,8 @@ public class MainGUI {
 		txtCity.setColumns(10);
 
 		JLabel lblPrihlseniePsaDo = new JLabel("Prihl\u00E1senie psov do evidencie");
+		nazov = "Prihl\u00E1senie psov do evidencie";
+		
 		lblPrihlseniePsaDo.setBounds(323, 11, 171, 14);
 		frame.getContentPane().add(lblPrihlseniePsaDo);
 
