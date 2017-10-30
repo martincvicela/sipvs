@@ -1,8 +1,6 @@
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
@@ -25,7 +23,7 @@ public class Signature extends AbstractSignature {
 	
 	static public void sign(List<String> documentNames) throws IOException {
 		int rc = -1;		
-	 XadesSig dSigner = new XadesSig();
+		XadesSig dSigner = new XadesSig();
 		dSigner.installLookAndFeel();
 		dSigner.installSwingLocalization();
 		dSigner.reset();
@@ -67,11 +65,19 @@ public class Signature extends AbstractSignature {
 			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
 		}		
-
-		System.out.println(dSigner.getSignedXmlWithEnvelope());
+		
+		String signedWithTimeStamp = getTimeStamp(dSigner.getSignedXmlWithEnvelope());
+		System.out.println(signedWithTimeStamp); //zatial vypÌsaù zÌskan˙ peËiatku, nevieme eöte Ëo v nej bude
+		
 		PrintWriter out = new PrintWriter("signedXml.xml");
 		out.println(dSigner.getSignedXmlWithEnvelope());
 		out.close();		
+	}
+	
+	static public String getTimeStamp(String xmlData) {
+		TimeStamp TimeClient = new TimeStamp();
+		String timeStampString = TimeClient.getTS(xmlData);
+		return timeStampString;
 	}
 	
 }
