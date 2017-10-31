@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="jsoup-1.10.3.jar"/>
 	<classpathentry kind="lib" path="NG/dsigner-plugin-xml-2.0.0.6-DEE492.jar"/>
 	<classpathentry kind="lib" path="C:/skola9/SIPVS/Git/sipvs/bcprov-jdk15on-158.jar"/>
+	<classpathentry kind="lib" path="C:/skola9/SIPVS/Git/sipvs/cxf-api-2.7.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
