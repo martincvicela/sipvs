@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 
 public class Signature extends AbstractSignature {
 	
-	private static String makeid() {
+	public static String makeid() {
 		  String text = "";
 		  String possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
