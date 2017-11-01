@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -55,7 +56,7 @@ public class Signature extends AbstractSignature {
 			rc = dSigner.addObject(xmlObject);
 		}
 		
-		if (rc != 0) {
+		/*if (rc != 0) {
 			System.out.println("XadesSig.addObject() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
 			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
@@ -67,14 +68,17 @@ public class Signature extends AbstractSignature {
 			System.out.println("XadesSig.sign20() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
 			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
-		}		
+		}*/
 		
-		String signedWithTimeStamp = getTimeStamp(dSigner.getSignedXmlWithEnvelope());
+		File fXmlFile = new File("c:/skola9/SIPVS/Git/sipvs/signedXml.xml");
+		
+		//String signedWithTimeStamp = getTimeStamp(dSigner.getSignedXmlWithEnvelope());
+		String signedWithTimeStamp = getTimeStamp(fXmlFile.toString());
 		System.out.println(signedWithTimeStamp); //zatial vypÌsaù zÌskan˙ peËiatku, nevieme eöte Ëo v nej bude
 		
-		PrintWriter out = new PrintWriter("signedXml.xml");
+		/*PrintWriter out = new PrintWriter("signedXml.xml");
 		out.println(dSigner.getSignedXmlWithEnvelope());
-		out.close();		
+		out.close();	*/	
 	}
 	
 	static public String getTimeStamp(String xmlData) {
