@@ -2,13 +2,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.tsp.TimeStampResp;
@@ -26,16 +30,19 @@ import org.bouncycastle.tsp.TimeStampToken; //https://www.bouncycastle.org/lates
 import org.apache.cxf.*;
 import java.net.URL;
 
+import javax.xml.bind.Element;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+import javax.xml.ws.handler.MessageContext;
 
 public class TimeStamp {
 	
 	public String getTS(String input) {
 		
+		//náhrada za import sk.ditec.TS;
 		URL wsdlURL = null;
 		try {
 			wsdlURL = new URL("http://test.ditec.sk/timestampws/TS.asmx?wsdl");
@@ -44,13 +51,48 @@ public class TimeStamp {
 			e.printStackTrace();
 		}
 		Service service = Service.create(wsdlURL, new QName("http://www.ditec.sk/", "TS"));
-		Dispatch<Source> disp = service.createDispatch(new QName("http://www.ditec.sk/", "TSSoap"), Source.class, Service.Mode.PAYLOAD);
-		 
-		Source request = new StreamSource(input);
-		//Source stringRequest = Base64.getEncoder().encodeToString(input.getBytes("utf-8"));
-		Source response = disp.invoke(request);
-		System.out.println(response);
+		Dispatch<Source> disp = service.createDispatch(new QName("http://www.ditec.sk/", "TSSoap"), Source.class, Service.Mode.MESSAGE);
 		
+		Map<String, Object> headers = new HashMap<String, Object>();
+	    headers.put("Content-Type", Arrays.asList(new String[] {"application/timestamp-query"}));
+		disp.getRequestContext().put(MessageContext.HTTP_REQUEST_METHOD, "POST");
+		disp.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+		
+		Source response = (Source)disp.invoke(new StreamSource(new StringReader(input)));
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		String timeStampB64 = response.toString();
+		
+		TimeStampResponse TSresponse = null;
+		try {
+			TSresponse = new TimeStampResponse(Base64.getDecoder().decode(timeStampB64.getBytes()));
+		} catch (TSPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		TimeStampToken timestampToken = TSresponse.getTimeStampToken();
+		   
+		/*Element docElement = DOMUtils.sourceToElement(retObj);
+		Element retElement = DOMUtils.getFirstChildElement(docElement);
+		String retPayload = DOMWriter.printNode(retElement, false);*/
+	    
+		//Source request = new StreamSource(input);
+		//String stringRequest = Base64.getEncoder().encodeToString(input.getBytes("utf-8"));
+		//Source response = disp.invoke(request);
+		//String response = disp.invoke(stringRequest);
+		//System.out.println(response);
+		//System.out.println(((Map<String, Object>) disp.getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS)).get(null));
+		
+		try {
+			System.out.println(new String(Base64.getEncoder().encode(timestampToken.getEncoded())));
+			return new String(Base64.getEncoder().encode(timestampToken.getEncoded()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "";
 	}
 

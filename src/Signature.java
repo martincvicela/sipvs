@@ -1,14 +1,34 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import sk.ditec.zep.dsigner.xades.XadesSig;
 import sk.ditec.zep.dsigner.xades.plugin.DataObject;
 import sk.ditec.zep.dsigner.xades.plugins.xmlplugin.XmlPlugin;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class Signature extends AbstractSignature {
 	
@@ -56,7 +76,7 @@ public class Signature extends AbstractSignature {
 			rc = dSigner.addObject(xmlObject);
 		}
 		
-		/*if (rc != 0) {
+		if (rc != 0) {
 			System.out.println("XadesSig.addObject() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
 			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
@@ -68,17 +88,29 @@ public class Signature extends AbstractSignature {
 			System.out.println("XadesSig.sign20() errorCode=" + rc + ", errorMessage=" + dSigner.getErrorMessage());
 			JOptionPane.showMessageDialog(null, dSigner.getErrorMessage());
 			return;
-		}*/
+		}
 		
-		File fXmlFile = new File("c:/skola9/SIPVS/Git/sipvs/signedXml.xml");
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = null;
+		InputSource source = new InputSource(new StringReader(dSigner.getSignedXmlWithEnvelope()));
+		Document document = null;
+		try {
+			docBuilder = docFactory.newDocumentBuilder();
+			document = docBuilder.parse(source);
+		} catch (SAXException | ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 		
-		//String signedWithTimeStamp = getTimeStamp(dSigner.getSignedXmlWithEnvelope());
-		String signedWithTimeStamp = getTimeStamp(fXmlFile.toString());
-		System.out.println(signedWithTimeStamp); //zatial vypÌsaù zÌskan˙ peËiatku, nevieme eöte Ëo v nej bude
+		Node signatureValue = document.getElementsByTagName("ds:SignatureValue").item(0);
+		
+		
+		String timeStampValue = getTimeStamp(signatureValue.getTextContent());
+		System.out.println(timeStampValue); //zatial vypÌsaù zÌskan˙ peËiatku, nevieme eöte Ëo v nej bude
 		
 		/*PrintWriter out = new PrintWriter("signedXml.xml");
 		out.println(dSigner.getSignedXmlWithEnvelope());
 		out.close();	*/	
+		
 	}
 	
 	static public String getTimeStamp(String xmlData) {
