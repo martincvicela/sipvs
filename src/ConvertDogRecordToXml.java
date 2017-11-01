@@ -10,7 +10,7 @@ public class ConvertDogRecordToXml {
 
 	  try {
 
-		String fileName = new String("file" + Math.random() + ".xml");
+		String fileName = new String("file" + Signature.makeid() + ".xml");
 		System.out.println(fileName);
 		File file = new File(fileName);
 		JAXBContext jaxbContext = JAXBContext.newInstance(DogEvidenceRecord.class);
