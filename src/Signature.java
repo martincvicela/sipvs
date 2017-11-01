@@ -37,14 +37,14 @@ public class Signature extends AbstractSignature {
 			DataObject xmlObject = xmlPlugin.createObject2(
 					documentNames.get(i).replaceAll("[.]", ""), 
 					MainGUI.nazov, 
-					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/" + documentNames.get(i)),
-					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
-					//readResource("c:/skola9/SIPVS/Git/sipvs/" + documentNames.get(i)),
-					//readResource("c:/skola9/SIPVS/Git/sipvs/file.xsd"), 
+					//readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/" + documentNames.get(i)),
+					//readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsd"), 
+					readResource("c:/skola9/SIPVS/Git/sipvs/" + documentNames.get(i)),
+					readResource("c:/skola9/SIPVS/Git/sipvs/file.xsd"), 
 					"",
 					"http://www.w3.org/2001/XMLSchema",
-					readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
-					//readResource("c:/skola9/SIPVS/Git/sipvs/file.xsl"),
+					//readResource("C:/Users/mato1/OneDrive/SIPVS/zadanie/file.xsl"),
+					readResource("c:/skola9/SIPVS/Git/sipvs/file.xsl"),
 					"http://www.w3.org/1999/XSL/Transform",
 					"HTML");
 

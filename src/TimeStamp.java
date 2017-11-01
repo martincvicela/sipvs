@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,12 +23,38 @@ import org.bouncycastle.tsp.TimeStampToken; //https://www.bouncycastle.org/lates
 //nepoužívajú tu TimeStampRequest ale miesto toho asi ditec.TS?
 //import sk.ditec.TS;
 
-//import org.apache.cxf;
+import org.apache.cxf.*;
+import java.net.URL;
 
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service;
 
 public class TimeStamp {
-
+	
 	public String getTS(String input) {
+		
+		URL wsdlURL = null;
+		try {
+			wsdlURL = new URL("http://test.ditec.sk/timestampws/TS.asmx?wsdl");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Service service = Service.create(wsdlURL, new QName("http://www.ditec.sk/", "TS"));
+		Dispatch<Source> disp = service.createDispatch(new QName("http://www.ditec.sk/", "TSSoap"), Source.class, Service.Mode.PAYLOAD);
+		 
+		Source request = new StreamSource(input);
+		//Source stringRequest = Base64.getEncoder().encodeToString(input.getBytes("utf-8"));
+		Source response = disp.invoke(request);
+		System.out.println(response);
+		
+		return "";
+	}
+
+	/*public String getTS(String input) {
 		
 		//String stringRequest = Base64.getEncoder().encodeToString(input.getBytes("utf-8"));
 		//String stringResponse = getTSAResponse(stringRequest);
@@ -60,15 +87,14 @@ public class TimeStamp {
 			e.printStackTrace();
 		}		
 		return "";
-	}
-	
-	//dalej tu riešia nejaké tokeny
-	private static InputStream getStandardTSAREsponse(byte request[]) {
+	}*/
+
+	/*private static InputStream getStandardTSAREsponse(byte request[]) {
 		InputStream in = null;
 		try {
 
 			OutputStream out = null;
-			URL url = new URL("http://test.ditec.sk/timestampws/TS.aspx");
+			URL url = new URL("http://test.ditec.sk/timestampws/TS.asmx");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setDoOutput(true);
 			con.setDoInput(true);
@@ -89,6 +115,6 @@ public class TimeStamp {
 			System.out.println(e);
 		}
 		return in;
-	}
+	}*/
 	
 }
