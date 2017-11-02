@@ -56,7 +56,7 @@ class DateLabelFormatter extends AbstractFormatter {
 public class MainGUI {
 
 	public static List<String> documentNames = new ArrayList<String>();
-	public static String pathToXMLFile = "C:/Users/mato1/OneDrive/SIPVS/zadanie/";
+	public static String pathToXMLFile = "";
 	private JFrame frame;
 	private JTable table;
 	private JTextField txtName;
@@ -137,6 +137,7 @@ public class MainGUI {
 		table = new JTable();
 		modeldog.fireTableDataChanged();
 		table.setModel(modeldog);
+		modeldog.addRow(new Dog("primalex", "rex", "german shepher", 123, new Date()));
 		JTableHeader header = table.getTableHeader();
 		header.setFont(f.deriveFont(Font.BOLD));
 
@@ -170,13 +171,13 @@ public class MainGUI {
 		frame.getContentPane().add(btn_SaveXml);
 
 		txtName = new JTextField();
-		txtName.setText("");
+		txtName.setText("Janko Hrasko");
 		txtName.setBounds(386, 44, 296, 20);
 		frame.getContentPane().add(txtName);
 		txtName.setColumns(10);
 
 		txtEmail = new JTextField();
-		txtEmail.setText("@");
+		txtEmail.setText("hrasko@mars.vesmir");
 		txtEmail.setBounds(175, 136, 198, 20);
 		frame.getContentPane().add(txtEmail);
 		txtEmail.setColumns(10);
@@ -192,7 +193,7 @@ public class MainGUI {
 		frame.getContentPane().add(lbl_telephoneNo);
 
 		textField_telephone = new JTextField();
-		textField_telephone.setText("");
+		textField_telephone.setText("090123456");
 		textField_telephone.setBounds(175, 94, 198, 20);
 		frame.getContentPane().add(textField_telephone);
 		textField_telephone.setColumns(10);
