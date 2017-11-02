@@ -56,6 +56,7 @@ class DateLabelFormatter extends AbstractFormatter {
 public class MainGUI {
 
 	public static List<String> documentNames = new ArrayList<String>();
+	public static String pathToXMLFile = "C:/Users/mato1/OneDrive/SIPVS/zadanie/";
 	private JFrame frame;
 	private JTable table;
 	private JTextField txtName;
@@ -200,9 +201,11 @@ public class MainGUI {
 		btn_ValidateXml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Validate XMLValidator = new Validate();
-				File xml = new File("file.xml");
-				File xsd = new File("file.xsd");
-				JOptionPane.showMessageDialog(null, XMLValidator.validateXML(xml, xsd));
+				for (int i = 0; i < documentNames.size(); i++) {
+					File xml = new File(pathToXMLFile + documentNames.get(i));
+					File xsd = new File("file.xsd");
+					JOptionPane.showMessageDialog(null, "XML cislo " + i + ": " + XMLValidator.validateXML(xml, xsd));
+				}
 			}
 		});
 		btn_ValidateXml.setBounds(221, 441, 108, 23);
@@ -217,15 +220,20 @@ public class MainGUI {
 				}
 
 				Desktop desktop = Desktop.getDesktop();
-				File file = new File("file.xml");
-
-				if (desktop.isSupported(Desktop.Action.OPEN)) {
-					try {
-						desktop.open(file);
-					} catch (IOException ioe) {
-						System.err.println("Unable to open: " + file.getName());
+				
+				for (int i = 0; i < documentNames.size(); i++) {
+					
+					File file = new File(pathToXMLFile + documentNames.get(i));
+					
+					if (desktop.isSupported(Desktop.Action.OPEN)) {
+						try {
+							desktop.open(file);
+						} catch (IOException ioe) {
+							System.err.println("Unable to open: " + file.getName());
+						}
 					}
 				}
+					
 			}
 		});
 		btn_TransformToHtml.setBounds(358, 441, 136, 23);

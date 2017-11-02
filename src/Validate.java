@@ -1,9 +1,14 @@
 import java.io.File;
+import java.util.List;
+
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+
+import sk.ditec.zep.dsigner.xades.plugin.DataObject;
+import sk.ditec.zep.dsigner.xades.plugins.xmlplugin.XmlPlugin;
 
 
 public class Validate {
