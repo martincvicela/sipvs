@@ -301,5 +301,15 @@ public class MainGUI {
 		});
 		btnSign.setBounds(525, 441, 116, 23);
 		frame.getContentPane().add(btnSign);
+		
+		JButton btnNewButton = new JButton("Verifier");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VerifierGUI dialog = new VerifierGUI();
+				dialog.setVisible(true);
+			}
+		});
+		btnNewButton.setBounds(522, 342, 192, 44);
+		frame.getContentPane().add(btnNewButton);
 	}
 }
