@@ -6,10 +6,15 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
-import java.io.File; 
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextPane;
 
@@ -72,6 +77,26 @@ public class VerifierGUI extends JDialog {
 						if (result == JFileChooser.APPROVE_OPTION) {
 						    File selectedFile = fileChooser.getSelectedFile();
 						    pathTextPane.setText(selectedFile.getAbsolutePath());
+						    
+						    //todo fix this
+						    try {
+								Validator validator = new Validator(fileChooser.getSelectedFile());
+								int validatorResult = validator.validate();
+								if(validatorResult == 0)
+									verifier_textArea.setText("everything seems OK");
+								else
+									verifier_textArea.setText("rule " + validatorResult + " broken");
+									
+							} catch (ParserConfigurationException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (SAXException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						    
 						}
 						
