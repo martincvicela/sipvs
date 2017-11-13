@@ -126,7 +126,7 @@ public class Signature extends AbstractSignature {
 		try {
 			//Generate XML file
 			Source xmlSource = new DOMSource(document);
-			Result result = new StreamResult(new FileOutputStream("signedWithStamp.xml"));
+			Result result = new StreamResult(new FileOutputStream("signedWithStamp" + count + ".xml"));
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty("indent", "yes");

@@ -30,13 +30,13 @@ public class TimeStamp {
 	
 	public String getTS(String input) {
 		
-		TimeStampRequestGenerator requestGenerator = new TimeStampRequestGenerator();
-		requestGenerator.setCertReq(false);
-        TimeStampRequest TSrequest = requestGenerator.generate(TSPAlgorithms.SHA1, input.getBytes());
+		//TimeStampRequestGenerator requestGenerator = new TimeStampRequestGenerator();
+		//requestGenerator.setCertReq(false);
+        //TimeStampRequest TSrequest = requestGenerator.generate(TSPAlgorithms.SHA1, input.getBytes());
         
         try {
-        	byte[] encodedRequest = TSrequest.getEncoded();
-			String rawOutput = IOUtils.readStringFromStream(getWholeTimeStamp(Base64.getEncoder().encode(encodedRequest)));
+        	//byte[] encodedRequest = TSrequest.getEncoded();
+			String rawOutput = IOUtils.readStringFromStream(getWholeTimeStamp(input.getBytes()));
 			System.out.println("Output: " + rawOutput);
 			byte[] responseByteData = Base64.getDecoder().decode(rawOutput.getBytes());
 			//String rawOutputParsed = parseXmlResponse(IOUtils.readStringFromStream(getWholeTimeStampXML(Base64.getEncoder().encodeToString(encodedRequest))));
@@ -81,7 +81,7 @@ public class TimeStamp {
 	/*
 	 * .NET servisa, cez 64-String input a XML output
 	 */
-	private static InputStream getWholeTimeStampXML(String base64data) {
+	/*private static InputStream getWholeTimeStampXML(String base64data) {
 		InputStream in = null;
 		try {
 			OutputStream out = null;
@@ -110,12 +110,12 @@ public class TimeStamp {
 			System.out.println(e);
 		}
 		return in;
-	}
+	}*/
 	
 	/*
 	 * Prvotriedne okaš¾anie, vezmem output ako XML DOM štruktúru a vytiahnem hash v <GetTimestampResult>:
 	 */
-	public String parseXmlResponse(String rawOutputXML) {
+	/*public String parseXmlResponse(String rawOutputXML) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = null;
 		InputSource source = new InputSource(new StringReader(rawOutputXML));
@@ -130,5 +130,5 @@ public class TimeStamp {
 		Node timeStampResult = document.getElementsByTagName("GetTimestampResult").item(0);
 		
 		return timeStampResult.getTextContent();
-	}
+	}*/
 }
