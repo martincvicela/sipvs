@@ -39,7 +39,7 @@ public class VerifierGUI extends JDialog {
 	 * Create the dialog.
 	 */
 	public VerifierGUI() {
-		setTitle("Verifier");
+		setTitle("OverovaË");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -49,17 +49,17 @@ public class VerifierGUI extends JDialog {
 		verifier_textArea.setBounds(10, 84, 414, 144);
 		contentPanel.add(verifier_textArea);
 		
-		JLabel lblNewLabel = new JLabel("Verification result");
+		JLabel lblNewLabel = new JLabel("V˝sledok overenia");
 		lblNewLabel.setBounds(10, 59, 112, 14);
 		contentPanel.add(lblNewLabel);
 		
 		JTextPane pathTextPane = new JTextPane();
-		pathTextPane.setText("please use \"Open File\" button and select file");
+		pathTextPane.setText("ProsÌm, pouûi tlaËidlo \"Otvor s˙bor\" a vyber s˙bor");
 		pathTextPane.setEditable(false);
 		pathTextPane.setBounds(10, 31, 414, 20);
 		contentPanel.add(pathTextPane);
 		
-		JLabel pathLabel_1 = new JLabel("selected path:");
+		JLabel pathLabel_1 = new JLabel("Vybrat· cesta:");
 		pathLabel_1.setBounds(10, 6, 77, 14);
 		contentPanel.add(pathLabel_1);
 		{
@@ -67,7 +67,7 @@ public class VerifierGUI extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Open File");
+				JButton okButton = new JButton("Otvor s˙bor");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						
@@ -83,9 +83,9 @@ public class VerifierGUI extends JDialog {
 								Validator validator = new Validator(fileChooser.getSelectedFile());
 								int validatorResult = validator.validate();
 								if(validatorResult == 0)
-									verifier_textArea.setText("everything seems OK");
+									verifier_textArea.setText("Vöetko vyzer· OK");
 								else
-									verifier_textArea.setText("rule " + validatorResult + " broken");
+									verifier_textArea.setText("Pravidlo " + validatorResult + " poruöenÈ");
 									
 							} catch (ParserConfigurationException e) {
 								// TODO Auto-generated catch block
@@ -107,8 +107,8 @@ public class VerifierGUI extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Verifie");
-				cancelButton.setActionCommand("Cancel");
+				JButton cancelButton = new JButton("Zruöiù");
+				cancelButton.setActionCommand("Zruöiù");
 				buttonPane.add(cancelButton);
 			}
 		}

@@ -302,7 +302,7 @@ public class MainGUI {
 		btnSign.setBounds(525, 441, 116, 23);
 		frame.getContentPane().add(btnSign);
 		
-		JButton btnNewButton = new JButton("Verifier");
+		JButton btnNewButton = new JButton("Over podpis");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VerifierGUI dialog = new VerifierGUI();
