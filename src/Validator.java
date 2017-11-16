@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -122,17 +124,20 @@ public class Validator {
 	}
 	
 		
-	int validate()
+	List<Integer> validate()
 	{
+		List<Integer> retList = new LinkedList<Integer>();;
 		for(int i = 0; i< rules.length; i++)
 		{
 			try {
 				if(!rules[i].verifie())
-					return i+1;
+				{
+					retList.add(i+1);
+				}
 			} catch (XPathExpressionException e) {
 				e.printStackTrace();
 			}
 		}
-		return 0;
+		return retList;
 	}
 }

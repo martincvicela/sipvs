@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextPane;
 
@@ -70,7 +71,7 @@ public class VerifierGUI extends JDialog {
 				JButton okButton = new JButton("Otvor súbor");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						
+						verifier_textArea.setText("");						
 						JFileChooser fileChooser = new JFileChooser();
 						fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 						int result = fileChooser.showOpenDialog(null);
@@ -81,11 +82,17 @@ public class VerifierGUI extends JDialog {
 						    //todo fix this
 						    try {
 								Validator validator = new Validator(fileChooser.getSelectedFile());
-								int validatorResult = validator.validate();
-								if(validatorResult == 0)
+								List<Integer> validatorResult = validator.validate();
+								if(validatorResult.isEmpty())
 									verifier_textArea.setText("Všetko vyzerá OK");
 								else
-									verifier_textArea.setText("Pravidlo " + validatorResult + " porušené");
+								{
+									for (Integer curr : validatorResult)
+									{
+										verifier_textArea.append(("Pravidlo " + curr + " porušené\n"));
+									}
+									
+								}
 									
 							} catch (ParserConfigurationException e) {
 								// TODO Auto-generated catch block
