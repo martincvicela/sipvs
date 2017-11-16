@@ -106,6 +106,18 @@ public class Validator {
 	        		}
 	        		return true;
 	        	} 
+	        },
+	        new Rule()
+	        {
+	        	/*Core validation (pod¾a špecifikácie XML Signature) – overenie hodnoty podpisu ds:SignatureValue a referencií v ds:SignedInfo:
+	        		-	dereferencovanie URI, kanonikalizácia referencovaných ds:Manifest elementov a overenie hodnôt odtlaèkov ds:DigestValue,
+	        		-	kanonikalizácia ds:SignedInfo a overenie hodnoty ds:SignatureValue pomocou pripojeného podpisového certifikátu v ds:KeyInfo,*/
+	        	public boolean verifie() 
+	        	{
+	        		//under construction
+	        		return true;
+	        	}
+	        	
 	        }
 	    };
 
