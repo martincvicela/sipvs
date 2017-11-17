@@ -41,13 +41,13 @@ public class VerifierGUI extends JDialog {
 	 */
 	public VerifierGUI() {
 		setTitle("Overovaè");
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 869, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		JTextArea verifier_textArea = new JTextArea();
-		verifier_textArea.setBounds(10, 84, 414, 144);
+		verifier_textArea.setBounds(10, 84, 833, 144);
 		contentPanel.add(verifier_textArea);
 		
 		JLabel lblNewLabel = new JLabel("Výsledok overenia");
@@ -57,7 +57,7 @@ public class VerifierGUI extends JDialog {
 		JTextPane pathTextPane = new JTextPane();
 		pathTextPane.setText("Prosím, použi tlaèidlo \"Otvor súbor\" a vyber súbor");
 		pathTextPane.setEditable(false);
-		pathTextPane.setBounds(10, 31, 414, 20);
+		pathTextPane.setBounds(10, 31, 833, 20);
 		contentPanel.add(pathTextPane);
 		
 		JLabel pathLabel_1 = new JLabel("Vybratá cesta:");
@@ -82,14 +82,14 @@ public class VerifierGUI extends JDialog {
 						    //todo fix this
 						    try {
 								Validator validator = new Validator(fileChooser.getSelectedFile());
-								List<Integer> validatorResult = validator.validate();
+								List<String> validatorResult = validator.validate();
 								if(validatorResult.isEmpty())
 									verifier_textArea.setText("Všetko vyzerá OK");
 								else
 								{
-									for (Integer curr : validatorResult)
+									for (String curr : validatorResult)
 									{
-										verifier_textArea.append(("Pravidlo " + curr + " porušené\n"));
+										verifier_textArea.append(("Porušené \n" + curr + "\n"));
 									}
 									
 								}
