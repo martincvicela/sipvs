@@ -53,6 +53,7 @@ public class Validator {
 	        { 
 	        	public String verifie() throws XPathExpressionException 
 	        	{ 
+	        		String returnValue = ""; 
 	        		Set<String> signatureMethods = new HashSet<String>();
 	        		Set<String> canonicalizationMethods = new HashSet<String>();
 	        		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1"); 
@@ -64,12 +65,15 @@ public class Validator {
 	        		
 	        		Node e = parsedDoc.getElementsByTagName("ds:SignatureMethod").item(0);
 	        		Node f = parsedDoc.getElementsByTagName("ds:CanonicalizationMethod").item(0);
-	        		if (signatureMethods.contains(e.getAttributes().getNamedItem("Algorithm").getNodeValue())
-	        				&& canonicalizationMethods.contains(f.getAttributes().getNamedItem("Algorithm").getNodeValue()))
+	        		if (!signatureMethods.contains(e.getAttributes().getNamedItem("Algorithm").getNodeValue()))        				
 	        		{
-	        			return "";
+	        			returnValue += "kontrola obsahu ds:SignatureMethod musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov pre danÈ elementy\n";
 	        		}
-	        		return "kontrola obsahu ds:SignatureMethod a ds:CanonicalizationMethod musia obsahovaù URI niektorÈho z podporovan˝ch algoritmov pre danÈ elementy ";
+	        		if (!canonicalizationMethods.contains(f.getAttributes().getNamedItem("Algorithm").getNodeValue()))
+	        		{
+	        			returnValue += "kontrola obsahu ds:CanonicalizationMethod musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov pre danÈ elementy\n";
+	        		}
+	        		return returnValue;
 	        	} 
 	        },
 	        /*
@@ -81,6 +85,7 @@ public class Validator {
 	        { 
 	        	public String verifie() 
 	        	{ 
+	        		String returnValue = "";
 	        		Set<String> transform = new HashSet<String>();
 	        		Set<String> digestMethod = new HashSet<String>();
 	        		transform.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"); 
@@ -95,16 +100,16 @@ public class Validator {
 	        		for (int i = 0; i < e.getLength(); i++) {
 	        			if (!transform.contains(e.item(i).getAttributes().getNamedItem("Algorithm").getNodeValue())) 
 	        			{
-	        				return "kontrola obsahu ds:Transforms a ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch";
+	        				returnValue += "kontrola obsahu ds:Transforms vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
 	        			}
 	        		}
 	        		for (int i = 0; i < f.getLength(); i++) {
 	        			if (!digestMethod.contains(f.item(i).getAttributes().getNamedItem("Algorithm").getNodeValue())) 
 	        			{
-	        				return "kontrola obsahu ds:Transforms a ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch";
+	        				returnValue += "kontrola obsahu ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
 	        			}
 	        		}
-	        		return "";
+	        		return returnValue;
 	        	} 
 	        },
 	        new Rule()
@@ -118,6 +123,58 @@ public class Validator {
 	        		return "";
 	        	}
 	        	
+	        },
+	        new Rule()
+	        {
+	        	/*ds:Signature:
+				ï	musÌ maù Id atrib˙t,
+				ï	musÌ maù öpecifikovan˝ namespace xmlns:ds,
+				*/
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";
+	        		Node e = parsedDoc.getElementsByTagName("ds:Signature").item(0).getAttributes().getNamedItem("Id");
+	        		Node f = parsedDoc.getElementsByTagName("ds:Signature").item(0).getAttributes().getNamedItem("xmlns:ds");
+	        		if (e == null) {
+	        			returnValue += "ds:Signature musÌ maù Id atrib˙t\n";
+	        		}
+	        		if (f == null || f.getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#") != 0) {
+	        			returnValue += "ds:Signature musÌ maù öpecifikovan˝ namespace xmlns:ds\n";
+	        		}	        				        		
+	        		return returnValue;
+	        	}
+	        	
+	        },
+	        new Rule()
+	        {
+	        	// ds:SignatureValue ñ musÌ maù Id atrib˙t
+	        	
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";
+	        		Node e = parsedDoc.getElementsByTagName("ds:SignatureValue").item(0).getAttributes().getNamedItem("Id");
+	        		if (e == null) {
+	        			returnValue += "ds:SignatureValue ñ musÌ maù Id atrib˙t\n";
+	        		}        				        		
+	        		return returnValue;
+	        	}        	
+	        },
+	        new Rule()
+	        {
+	        	/* overenie existencie referenciÌ v ds:SignedInfo a hodnÙt atrib˙tov Id a Type voËi profilu XAdES_ZEP pre:
+				*	ï	ds:KeyInfo element,
+				*	ï	ds:SignatureProperties element,
+				*	ï	xades:SignedProperties element,
+				*	ï	vöetky ostatnÈ referencie v r·mci ds:SignedInfo musia byù referenciami na ds:Manifest elementy
+	        	* */
+	        	
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";
+	        		
+	        		
+	        		return returnValue;
+	        	}        	
 	        }
 	    };
 
