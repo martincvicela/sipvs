@@ -166,16 +166,79 @@ public class Validator {
 				*	ï	ds:SignatureProperties element,
 				*	ï	xades:SignedProperties element,
 				*	ï	vöetky ostatnÈ referencie v r·mci ds:SignedInfo musia byù referenciami na ds:Manifest elementy
-	        	* */
-	        	
+	        	*/
+	        	//MATO -v rieseni
 	        	public String verifie() 
 	        	{
 	        		String returnValue = "";
-	        		
-	        		
+	        		NodeList e = parsedDoc.getElementsByTagName("ds:Reference");
+	        		boolean KeyInfo = false;
+	        		boolean SignatureProperties  = false;
+	        		boolean SignedProperties  = false;
+	        		for (int i = 0; i < e.getLength(); i++) {
+	        			if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Object") == 0) 
+	        			{
+	        				String keyInfoId = parsedDoc.getElementsByTagName("ds:KeyInfo").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+	        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
+	        				if (keyInfoId.compareTo(referenceURI) == 0) 
+	        				{
+	        					KeyInfo = true;
+	        				}
+	        			}
+	        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#SignatureProperties") == 0) 
+	        			{
+	        				
+	        				SignatureProperties = true;
+	        			}
+	        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://uri.etsi.org/01903#SignedProperties") == 0) 
+	        			{
+	        				SignedProperties = true;
+	        			}
+	        		}
+	        		if (!KeyInfo) 
+	        		{
+	        			returnValue += "neplatn· referencia na ds:KeyInfo element\n";
+	        		}
+	        		if (!SignatureProperties) 
+	        		{
+	        			returnValue += "neplatn· referencia na ds:SignatureProperties element\n";
+	        		}
+	        		if (!SignedProperties) 
+	        		{
+	        			returnValue += "neplatn· referencia na xades:SignedProperties element\n";
+	        		}
+	        			        		
 	        		return returnValue;
 	        	}        	
-	        }
+	        },
+	        new Rule()
+	        {
+        	/*	overenie obsahu ds:KeyInfo:
+    		 *	ï	musÌ maù Id atrib˙t,
+    		 *	ï	musÌ obsahovaù ds:X509Data, ktor˝ obsahuje elementy: ds:X509Certificate, ds:X509IssuerSerial, ds:X509SubjectName,
+    		 *	ï	hodnoty elementov ds:X509IssuerSerial a ds:X509SubjectName s˙hlasia s prÌsluön˝mi hodnatami v certifik·te, ktor˝ sa nach·dza v ds:X509Certificate,
+    		 */
+	        	//MATO -v rieseni
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";	        		    				        		
+	        		return returnValue;
+	        	}        	
+	        },
+	        new Rule()
+	        {
+	       /*	overenie obsahu ds:SignatureProperties:
+			*	ï	musÌ maù Id atrib˙t,
+			*	ï	musÌ obsahovaù dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos,
+			*	ï	obidva ds:SignatureProperty musia maù atrib˙t Target nastaven˝ na ds:Signature,
+	        */
+	        	//MATO -v rieseni
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";	        		    				        		
+	        		return returnValue;
+	        	}        	
+	        },
 	    };
 
 	public interface Rule{
