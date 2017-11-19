@@ -1,5 +1,9 @@
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +17,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.bouncycastle.util.encoders.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -178,7 +188,7 @@ public class Validator {
 	        	public String verifie() 
 	        	{
 	        		String returnValue = "";
-	        		NodeList e = parsedDoc.getElementsByTagName("ds:Reference");
+	        		NodeList e = parsedDoc.getElementsByTagName("ds:SignedInfo").item(0).getChildNodes();
 	        		NodeList f = parsedDoc.getElementsByTagName("ds:Manifest");
 	        		Set<String> manifestsIds = new HashSet<String>();
 	        		for (int i = 0; i < f.getLength(); i++) { 		
@@ -196,61 +206,63 @@ public class Validator {
 	        		boolean SignatureProperties  = false;
 	        		boolean SignedProperties  = false;
 	        		
-	        		for (int i = 0; i < e.getLength(); i++) {
-	        			if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Object") == 0) 
-	        			{
-	        				String keyInfoId = parsedDoc.getElementsByTagName("ds:KeyInfo").item(0).getAttributes().getNamedItem("Id").getNodeValue();
-	        				if (keyInfoId == null) 
-	        				{
-	        					returnValue += "ds:KeyInfo musí ma Id atribút\n";
-	        				}
-	        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
-	        				if (referenceURI != null && keyInfoId.compareTo(referenceURI) == 0) 
-	        				{
-	        					KeyInfo = true;
-	        				}
-	        			}
-	        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#SignatureProperties") == 0) 
-	        			{
-	        				String signaturePropertiesId = parsedDoc.getElementsByTagName("ds:SignatureProperties").item(0).getAttributes().getNamedItem("Id").getNodeValue();
-	        				if (signaturePropertiesId == null) 
-	        				{
-	        					returnValue += "ds:SignatureProperties musí ma Id atribút\n";
-	        				}
-	        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
-	        				if (referenceURI != null && signaturePropertiesId.compareTo(referenceURI) == 0) 
-	        				{
-	        					SignatureProperties = true;
-	        				}    				
-	        			}
-	        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://uri.etsi.org/01903#SignedProperties") == 0) 
-	        			{
-	        				String signedPropertiesId = parsedDoc.getElementsByTagName("xades:SignedProperties").item(0).getAttributes().getNamedItem("Id").getNodeValue();
-	        				if (signedPropertiesId == null) 
-	        				{
-	        					returnValue += "xades:SignedProperties musí ma Id atribút\n";
-	        				}
-	        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
-	        				if (referenceURI != null && signedPropertiesId.compareTo(referenceURI) == 0) 
-	        				{
-	        					SignedProperties = true;
-	        				}    				        				
-	        			}
-	        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Manifest") == 0) 
-	        			{
-	        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
-	        				if (referenceURI == null) 
-	        				{
-	        					returnValue += "neplatná referencia na ds:Manifest element\n";
-	        				}
-	        				else if (!manifestsIds.contains(referenceURI)) 
-	        				{
-	        					returnValue += "neplatná referencia na ds:Manifest element\n";
-	        				}    		 
-	        			}
-	        			else 
-	        			{
-	        				returnValue += "všetky ostatné referencie v rámci ds:SignedInfo musia by referenciami na ds:Manifest elementy\n";
+        			for (int i = 0; i < e.getLength(); i++) {
+	        			if (e.item(i).getNodeName().compareTo("ds:Reference") == 0) {
+		        			if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Object") == 0) 
+		        			{
+		        				String keyInfoId = parsedDoc.getElementsByTagName("ds:KeyInfo").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+		        				if (keyInfoId == null) 
+		        				{
+		        					returnValue += "ds:KeyInfo musí ma Id atribút\n";
+		        				}
+		        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
+		        				if (referenceURI != null && keyInfoId.compareTo(referenceURI) == 0) 
+		        				{
+		        					KeyInfo = true;
+		        				}
+		        			}
+		        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#SignatureProperties") == 0) 
+		        			{
+		        				String signaturePropertiesId = parsedDoc.getElementsByTagName("ds:SignatureProperties").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+		        				if (signaturePropertiesId == null) 
+		        				{
+		        					returnValue += "ds:SignatureProperties musí ma Id atribút\n";
+		        				}
+		        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
+		        				if (referenceURI != null && signaturePropertiesId.compareTo(referenceURI) == 0) 
+		        				{
+		        					SignatureProperties = true;
+		        				}    				
+		        			}
+		        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://uri.etsi.org/01903#SignedProperties") == 0) 
+		        			{
+		        				String signedPropertiesId = parsedDoc.getElementsByTagName("xades:SignedProperties").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+		        				if (signedPropertiesId == null) 
+		        				{
+		        					returnValue += "xades:SignedProperties musí ma Id atribút\n";
+		        				}
+		        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
+		        				if (referenceURI != null && signedPropertiesId.compareTo(referenceURI) == 0) 
+		        				{
+		        					SignedProperties = true;
+		        				}    				        				
+		        			}
+		        			else if (e.item(i).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Manifest") == 0) 
+		        			{
+		        				String referenceURI = e.item(i).getAttributes().getNamedItem("URI").getNodeValue().substring(1);
+		        				if (referenceURI == null) 
+		        				{
+		        					returnValue += "neplatná referencia na ds:Manifest element\n";
+		        				}
+		        				else if (!manifestsIds.contains(referenceURI)) 
+		        				{
+		        					returnValue += "neplatná referencia na ds:Manifest element\n";
+		        				}    		 
+		        			}
+		        			else 
+		        			{
+		        				returnValue += "všetky ostatné referencie v rámci ds:SignedInfo musia by referenciami na ds:Manifest elementy\n";
+		        			}
 	        			}
 	        		}
 	        		if (!KeyInfo) 
@@ -274,10 +286,58 @@ public class Validator {
     		 *	•	musí obsahova ds:X509Data, ktorý obsahuje elementy: ds:X509Certificate, ds:X509IssuerSerial, ds:X509SubjectName,
     		 *	•	hodnoty elementov ds:X509IssuerSerial a ds:X509SubjectName súhlasia s príslušnými hodnatami v certifikáte, ktorý sa nachádza v ds:X509Certificate,
     		 */
-	        	//MATO -v rieseni
 	        	public String verifie() 
 	        	{
-	        		String returnValue = "";	        		    				        		
+	        		String returnValue = "";
+	        		Node X509Certificate = null, X509IssuerSerial = null, X509SubjectName = null;
+	        		Node e = parsedDoc.getElementsByTagName("ds:X509Data").item(0);
+	        		if (e != null && e.getParentNode().getNodeName().compareTo("ds:KeyInfo") == 0) {
+	        			NodeList f = e.getChildNodes();
+	        			for (int i = 0; i < f.getLength(); i++) {
+	        				if (f.item(i).getNodeName().compareTo("ds:X509Certificate") == 0) 
+	        				{
+	        					X509Certificate = f.item(i);
+	        				}
+	        				else if (f.item(i).getNodeName().compareTo("ds:X509IssuerSerial") == 0) 
+	        				{
+	        					X509IssuerSerial = f.item(i);
+	        				}
+	        				else if (f.item(i).getNodeName().compareTo("ds:X509SubjectName") == 0) 
+	        				{
+	        					X509SubjectName = f.item(i);
+	        				}
+	        			}
+	        			if (X509Certificate == null || X509IssuerSerial == null || X509SubjectName == null) {
+	        				returnValue += "ds:KeyInfo musí obsahova ds:X509Data, ktorý obsahuje elementy: ds:X509Certificate, ds:X509IssuerSerial, ds:X509SubjectName\n";
+	        			}
+	        			else {
+	        				try {
+	        					String X509IssuerName = X509IssuerSerial.getFirstChild().getTextContent();
+	        					String X509SerialNumber = X509IssuerSerial.getLastChild().getTextContent();
+								X509CertificateObject certificate = loadCertificate(X509Certificate);
+								String cIssuerName = certificate.getIssuerX500Principal().toString().replace("ST", "S");
+								String cSerialNumber = certificate.getSerialNumber().toString();
+								String cSubjectName = certificate.getSubjectX500Principal().toString();
+								if (X509IssuerName == null 
+										|| X509SerialNumber == null 
+										|| X509IssuerName.compareTo(cIssuerName) != 0 
+										|| X509SerialNumber.compareTo(cSerialNumber) != 0
+										|| X509SubjectName.getTextContent().compareTo(cSubjectName) != 0) 
+								{
+									returnValue += "hodnoty elementov ds:X509IssuerSerial a ds:X509SubjectName súhlasia s príslušnými hodnatami v certifikáte, ktorý sa nachádza v ds:X509Certificate\n";
+								}
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							} catch (GeneralSecurityException e1) {
+								e1.printStackTrace();
+							}	
+	        			}
+	        		}
+	        		else 
+	        		{
+	        			returnValue += "ds:KeyInfo musí obsahova ds:X509Data\n";
+	        		}
+	        		
 	        		return returnValue;
 	        	}        	
 	        },
@@ -308,6 +368,17 @@ public class Validator {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		parsedDoc = builder.parse(xmlFile);
 		xpath = XPathFactory.newInstance().newXPath();
+	}
+	
+	//from https://www.programcreek.com/java-api-examples/index.php?api=org.bouncycastle.jce.provider.X509CertificateObject
+	
+	private X509CertificateObject loadCertificate(Node X509Certificate) throws IOException, GeneralSecurityException {
+		InputStream in = new ByteArrayInputStream(Base64.decode(X509Certificate.getTextContent()));
+	    ASN1InputStream derin = new ASN1InputStream(in);
+	    ASN1Primitive certInfo = derin.readObject();
+	    derin.close();
+	    ASN1Sequence seq = ASN1Sequence.getInstance(certInfo);
+	    return new X509CertificateObject(Certificate.getInstance(seq));
 	}
 	
 		
