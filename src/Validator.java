@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -347,10 +346,61 @@ public class Validator {
 			*	ï	musÌ obsahovaù dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos,
 			*	ï	obidva ds:SignatureProperty musia maù atrib˙t Target nastaven˝ na ds:Signature,
 	        */
-	        	//MATO -v rieseni
 	        	public String verifie() 
 	        	{
-	        		String returnValue = "";	        		    				        		
+	        		String returnValue = "";	
+	        		NodeList e = parsedDoc.getElementsByTagName("ds:SignatureProperty");
+	        		if (e != null 
+	        				&& e.getLength() == 2 
+	        				&& e.item(0).getParentNode().getNodeName().compareTo("ds:SignatureProperties") == 0 
+	        				&& e.item(1).getParentNode().getNodeName().compareTo("ds:SignatureProperties") == 0) 
+	        		{
+	        			Node property1 = e.item(0);
+	        			Node property2 = e.item(1);
+	        			if (property1.getFirstChild().getNodeName().compareTo("xzep:SignatureVersion") == 0
+	        					&& property2.getFirstChild().getNodeName().compareTo("xzep:ProductInfos") == 0
+	        					|| property1.getFirstChild().getNodeName().compareTo("xzep:ProductInfos") == 0
+	        					&& property2.getFirstChild().getNodeName().compareTo("xzep:SignatureVersion") == 0)
+	        			{
+	        				String signatureId = parsedDoc.getElementsByTagName("ds:Signature").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+	        				String property1Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
+	        				String property2Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
+	        				if (!(signatureId != null && property1Target != null && property2Target != null
+	        						&& signatureId.compareTo(property1Target) == 0
+	        						&& signatureId.compareTo(property2Target) == 0)) 
+	        				{
+	        					System.out.println(signatureId);
+	        					System.out.println(property1Target);
+	        					System.out.println(property2Target);
+	        					returnValue += "obidva ds:SignatureProperty musia maù atrib˙t Target nastaven˝ na ds:Signature";
+	        				}
+	        			}
+	        			else 
+	        			{
+	        				returnValue += "ds:SignatureProperties musÌ obsahovaù dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos\n";
+	        			}
+	        		}
+	        		else 
+	        		{
+	        			returnValue += "ds:SignatureProperties musÌ obsahovaù dva elementy ds:SignatureProperty\n";
+	        		}
+	        		return returnValue;
+	        	}        	
+	        },
+	        new Rule()
+	        {
+	       /* overenie ds:Manifest elementov:
+			*	ï	kaûd˝ ds:Manifest element musÌ maù Id atrib˙t,
+			*	ï	ds:Transforms musÌ byù z mnoûiny podporovan˝ch algoritmov pre dan˝ element podæa profilu XAdES_ZEP,
+			*	ï	ds:DigestMethod ñ musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov podæa profilu XAdES_ZEP,
+			*	ï	overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP,
+			*	ï	kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object,
+	        */
+	        	//MATO - v rieseni
+	        	public String verifie() 
+	        	{
+	        		String returnValue = "";	
+	        		
 	        		return returnValue;
 	        	}        	
 	        },
@@ -370,7 +420,7 @@ public class Validator {
 		xpath = XPathFactory.newInstance().newXPath();
 	}
 	
-	//from https://www.programcreek.com/java-api-examples/index.php?api=org.bouncycastle.jce.provider.X509CertificateObject
+	//inspired by https://www.programcreek.com/java-api-examples/index.php?api=org.bouncycastle.jce.provider.X509CertificateObject
 	
 	private X509CertificateObject loadCertificate(Node X509Certificate) throws IOException, GeneralSecurityException {
 		InputStream in = new ByteArrayInputStream(Base64.decode(X509Certificate.getTextContent()));
