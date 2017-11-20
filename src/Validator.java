@@ -63,15 +63,8 @@ public class Validator {
 	        	public String verifie() throws XPathExpressionException 
 	        	{ 
 	        		String returnValue = ""; 
-	        		Set<String> signatureMethods = new HashSet<String>();
-	        		Set<String> canonicalizationMethods = new HashSet<String>();
-	        		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1"); 
-	        		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
-	        		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-	        		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384");
-	        		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
-	        		canonicalizationMethods.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-	        		
+	        		Set<String> signatureMethods = getSignature();
+	        		Set<String> canonicalizationMethods = getCanonicalization();
 	        		Node e = parsedDoc.getElementsByTagName("ds:SignatureMethod").item(0);
 	        		Node f = parsedDoc.getElementsByTagName("ds:CanonicalizationMethod").item(0);
 	        		if (!signatureMethods.contains(e.getAttributes().getNamedItem("Algorithm").getNodeValue()))        				
@@ -89,33 +82,43 @@ public class Validator {
 	         * Overenie XML Signature:
 			 *	ï	kontrola obsahu ds:Transforms a ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo 
 			 *		ñ musia obsahovaù URI niektorÈho z podporovan˝ch algoritmov podæa profilu XAdES_ZEP
+			 * overenie ds:Manifest elementov:
+			 *	ï	ds:Transforms musÌ byù z mnoûiny podporovan˝ch algoritmov pre dan˝ element podæa profilu XAdES_ZEP,
+			 *	ï	ds:DigestMethod ñ musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov podæa profilu XAdES_ZEP,
 	         */
 	        new Rule() 
 	        { 
 	        	public String verifie() 
 	        	{ 
 	        		String returnValue = "";
-	        		Set<String> transform = new HashSet<String>();
-	        		Set<String> digestMethod = new HashSet<String>();
-	        		transform.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"); 
-	        		digestMethod.add("http://www.w3.org/2000/09/xmldsig#sha1");
-	        		digestMethod.add("http://www.w3.org/2001/04/xmldsig-more#sha224");
-	        		digestMethod.add("http://www.w3.org/2001/04/xmlenc#sha256");
-	        		digestMethod.add("http://www.w3.org/2001/04/xmldsig-more#sha384");
-	        		digestMethod.add("http://www.w3.org/2001/04/xmlenc#sha512");
+	        		Set<String> digestMethod = getDigest();	
+	        		Set<String> transform = getTransform();
 	        		
 	        		NodeList e = parsedDoc.getElementsByTagName("ds:Transform");
 	        		NodeList f = parsedDoc.getElementsByTagName("ds:DigestMethod");
 	        		for (int i = 0; i < e.getLength(); i++) {
 	        			if (!transform.contains(e.item(i).getAttributes().getNamedItem("Algorithm").getNodeValue())) 
 	        			{
-	        				returnValue += "kontrola obsahu ds:Transforms vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
+	        				if (e.item(i).getParentNode().getParentNode().getParentNode().getNodeName().compareTo("ds:Manifest") == 0) 
+	        				{
+	        					returnValue += "overenie ds:Manifest elementov: ds:Transforms musÌ byù z mnoûiny podporovan˝ch algoritmov pre dan˝ element podæa profilu XAdES_ZEP\n";
+	        				}
+	        				else if (e.item(i).getParentNode().getParentNode().getParentNode().getNodeName().compareTo("ds:SignedInfo") == 0) 
+	        				{
+	        					returnValue += "kontrola obsahu ds:Transforms vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
+	        				}
 	        			}
 	        		}
 	        		for (int i = 0; i < f.getLength(); i++) {
 	        			if (!digestMethod.contains(f.item(i).getAttributes().getNamedItem("Algorithm").getNodeValue())) 
 	        			{
-	        				returnValue += "kontrola obsahu ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
+	        				if (f.item(i).getParentNode().getParentNode().getNodeName().compareTo("ds:Manifest") == 0) {
+	        					returnValue += "overenie ds:Manifest elementov: ds:DigestMethod ñ musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov podæa profilu XAdES_ZEP\n";
+	        				}
+	        				else if (f.item(i).getParentNode().getParentNode().getNodeName().compareTo("ds:SignedInfo") == 0)
+	        				{
+	        					returnValue += "kontrola obsahu ds:DigestMethod vo vöetk˝ch referenci·ch v ds:SignedInfo musia obsahovaù URI niektorÈho z podporovan˝ch\n";
+	        				}
 	        			}
 	        		}
 	        		return returnValue;
@@ -390,16 +393,37 @@ public class Validator {
 	        new Rule()
 	        {
 	       /* overenie ds:Manifest elementov:
-			*	ï	kaûd˝ ds:Manifest element musÌ maù Id atrib˙t,
-			*	ï	ds:Transforms musÌ byù z mnoûiny podporovan˝ch algoritmov pre dan˝ element podæa profilu XAdES_ZEP,
-			*	ï	ds:DigestMethod ñ musÌ obsahovaù URI niektorÈho z podporovan˝ch algoritmov podæa profilu XAdES_ZEP,
 			*	ï	overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP,
 			*	ï	kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object,
 	        */
-	        	//MATO - v rieseni
 	        	public String verifie() 
 	        	{
-	        		String returnValue = "";	
+	        		String returnValue = "";
+	        		NodeList manifests = parsedDoc.getElementsByTagName("ds:Manifest");
+	        		
+	        		if (manifests != null) {
+		        		for(int i = 0; i < manifests.getLength(); i++) {
+		        			NodeList childrens = manifests.item(i).getChildNodes();
+		        			int references = 0;
+		        			for (int j = 0; j < childrens.getLength(); j++) {
+		        				if (childrens.item(j).getNodeName().compareTo("ds:Reference") == 0) 
+		        				{
+		        					references++;
+		        					if (childrens.item(j).getAttributes().getNamedItem("Type").getNodeValue().compareTo("http://www.w3.org/2000/09/xmldsig#Object") != 0) 
+		        					{
+		        						returnValue += "overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP\n";
+		        					}
+		        				}
+		        			}
+		        			if (references != 1) {
+		        				returnValue += "kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object\n";
+		        			}
+		        		}	
+	        		}
+	        		else 
+	        		{
+	        			returnValue += "overenie ds:Manifest elementov - element neexistuje\n";
+	        		}
 	        		
 	        		return returnValue;
 	        	}        	
@@ -429,6 +453,42 @@ public class Validator {
 	    derin.close();
 	    ASN1Sequence seq = ASN1Sequence.getInstance(certInfo);
 	    return new X509CertificateObject(Certificate.getInstance(seq));
+	}
+	
+	private Set<String> getDigest () { 
+		Set<String> digestMethod = new HashSet<String>();	
+		digestMethod.add("http://www.w3.org/2000/09/xmldsig#sha1");
+		digestMethod.add("http://www.w3.org/2001/04/xmldsig-more#sha224");
+		digestMethod.add("http://www.w3.org/2001/04/xmlenc#sha256");
+		digestMethod.add("http://www.w3.org/2001/04/xmldsig-more#sha384");
+		digestMethod.add("http://www.w3.org/2001/04/xmlenc#sha512");
+		
+		return digestMethod;
+	}
+	
+	private Set<String> getTransform() {
+		Set<String> transform = new HashSet<String>();
+		transform.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+		
+		return transform;
+	}
+	
+	private Set<String> getSignature() {
+		Set<String> signatureMethods = new HashSet<String>();
+		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1"); 
+		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384");
+		signatureMethods.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+		
+		return signatureMethods;
+	}
+	
+	private Set<String> getCanonicalization() {
+		Set<String> canonicalizationMethods = new HashSet<String>();
+		canonicalizationMethods.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+		
+		return canonicalizationMethods;
 	}
 	
 		
