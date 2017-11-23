@@ -1,13 +1,40 @@
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.security.cert.CRLException;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.crypto.AlgorithmMethod;
+import javax.xml.crypto.KeySelector;
+import javax.xml.crypto.KeySelectorException;
+import javax.xml.crypto.KeySelectorResult;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLCryptoContext;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.XMLSignatureException;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +54,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
+
+import sun.security.provider.certpath.OCSP;
 
 public class Validator {
 	private  Document parsedDoc;
@@ -428,11 +459,150 @@ public class Validator {
 	        		return returnValue;
 	        	}        	
 	        },
-	    };
+	        new Rule()
+	        {
+	       /* overenie ds:Manifest elementov:
+			*	ï	overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP,
+			*	ï	kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object,
+	        */
+	        	public String verifie() 
+	        	{
+	        		/*String returnValue = "";
+	        		CertificateFactory cf;
+	        		
+					try {
+						cf = CertificateFactory.getInstance("X.509");
 
+		        	    FileInputStream in;
+		        	    in = new FileInputStream("eeccrca.crl");
+		        	    X509CRL crl = (X509CRL) cf.generateCRL(in);
+		        	    Set s = crl.getRevokedCertificates();
+		        	    
+					} catch (CertificateException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}						
+					catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (CRLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	        	    
+	        	    
+	        		return "lol";*/
+	        		// Validate the XMLSignature.
+	        		try {
+		        		// Find Signature element.
+
+		        		// Find Signature element.
+		        		NodeList nl =
+		        		    parsedDoc.getElementsByTagNameNS("*", "Signature");
+		        		if (nl.getLength() == 0) {
+		        		    throw new Exception("Cannot find Signature element");
+		        		}
+
+		        		// Create a DOMValidateContext and specify a KeySelector
+		        		// and document context.
+		        		DOMValidateContext valContext = new DOMValidateContext
+		        	            (new KeyValueKeySelector(), nl.item(0));
+
+		        		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+		        		// Unmarshal the XMLSignature.
+		        		javax.xml.crypto.dsig.XMLSignature signature = fac.unmarshalXMLSignature(valContext);
+		        		
+		        		
+						boolean coreValidity = signature.validate(valContext);
+
+						// Check core validation status.
+						if (coreValidity == false) {
+						    System.err.println("Signature failed core validation");
+						    boolean sv = signature.getSignatureValue().validate(valContext);
+						    System.out.println("signature validation status: " + sv);
+						    if (sv == false) {
+						        // Check the validation status of each Reference.
+						        Iterator i = signature.getSignedInfo().getReferences().iterator();
+						        for (int j=0; i.hasNext(); j++) {
+						            boolean refValid = ((Reference) i.next()).validate(valContext);
+						            System.out.println("ref["+j+"] validity status: " + refValid);
+						        }
+						    }
+						} else {
+						    System.out.println("Signature passed core validation");
+						}
+					} catch (XMLSignatureException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MarshalException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	        		return "core validacia";
+	        	}	 
+	        }
+	    };
+	
 	public interface Rule{
 	    public String verifie() throws XPathExpressionException; 
 	}
+	
+    private static class KeyValueKeySelector extends KeySelector {
+        public KeySelectorResult select(KeyInfo keyInfo,
+                                        KeySelector.Purpose purpose,
+                                        AlgorithmMethod method,
+                                        XMLCryptoContext context)
+            throws KeySelectorException {
+            if (keyInfo == null) {
+                throw new KeySelectorException("Null KeyInfo object!");
+            }
+            SignatureMethod sm = (SignatureMethod) method;
+            List list = keyInfo.getContent();
+
+            for (int i = 0; i < list.size(); i++) {
+                XMLStructure xmlStructure = (XMLStructure) list.get(i);
+                if (xmlStructure instanceof KeyValue) {
+                    PublicKey pk = null;
+                    try {
+                        pk = ((KeyValue)xmlStructure).getPublicKey();
+                    } catch (KeyException ke) {
+                        throw new KeySelectorException(ke);
+                    }
+                    // make sure algorithm is compatible with method
+                    if (algEquals(sm.getAlgorithm(), pk.getAlgorithm())) {
+                        return new SimpleKeySelectorResult(pk);
+                    }
+                }
+            }
+            throw new KeySelectorException("No KeyValue element found!");
+        }
+
+        //@@@FIXME: this should also work for key types other than DSA/RSA
+        static boolean algEquals(String algURI, String algName) {
+            if (algName.equalsIgnoreCase("DSA") &&
+                algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
+                return true;
+            } else if (algName.equalsIgnoreCase("RSA") &&
+                       algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    private static class SimpleKeySelectorResult implements KeySelectorResult {
+        private PublicKey pk;
+        SimpleKeySelectorResult(PublicKey pk) {
+            this.pk = pk;
+        }
+
+        public Key getKey() { return pk; }
+    }
+    
 	
 	//maybe this is not good idea, someday I will check for it
 	Validator(File xmlFile) throws ParserConfigurationException, SAXException, IOException
@@ -494,7 +664,7 @@ public class Validator {
 		
 	List<String> validate()
 	{
-		List<String> retList = new LinkedList<String>();;
+		List<String> retList = new LinkedList<String>();
 		for(int i = 0; i< rules.length; i++)
 		{
 			try {
