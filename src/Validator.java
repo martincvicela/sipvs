@@ -4,21 +4,33 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509CRL;
+import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 
 import javax.xml.crypto.AlgorithmMethod;
 import javax.xml.crypto.KeySelector;
@@ -46,9 +58,17 @@ import javax.xml.xpath.XPathFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
+import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.Store;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -423,7 +443,7 @@ public class Validator {
 	        },
 	        new Rule()
 	        {
-	       /* overenie ds:Manifest elementov:
+	       /* overenie  elementov:
 			*	ï	overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP,
 			*	ï	kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object,
 	        */
@@ -461,9 +481,9 @@ public class Validator {
 	        },
 	        new Rule()
 	        {
-	       /* overenie ds:Manifest elementov:
-			*	ï	overenie hodnoty Type atrib˙tu voËi profilu XAdES_ZEP,
-			*	ï	kaûd˝ ds:Manifest element musÌ obsahovaù pr·ve jednu referenciu na ds:Object,
+	       /* Core validation (podæa öpecifik·cie XML Signature) ñ overenie hodnoty podpisu ds:SignatureValue a referenciÌ v ds:SignedInfo:
+			* dereferencovanie URI, kanonikaliz·cia referencovan˝ch ds:Manifest elementov a overenie hodnÙt odtlaËkov ds:DigestValue,
+			* kanonikaliz·cia ds:SignedInfo a overenie hodnoty ds:SignatureValue pomocou pripojenÈho podpisovÈho certifik·tu v ds:KeyInfo,
 	        */
 	        	public String verifie() 
 	        	{
@@ -493,7 +513,7 @@ public class Validator {
 	        	    
 	        		return "lol";*/
 	        		// Validate the XMLSignature.
-	        		try {
+	        		/*try {
 		        		// Find Signature element.
 
 		        		// Find Signature element.
@@ -541,8 +561,124 @@ public class Validator {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-	        		return "core validacia";
+					*/
+	        		return "";
 	        	}	 
+	        },
+	        new Rule()
+	        {
+	       /* Overenie Ëasovej peËiatky:
+			* overenie platnosti podpisovÈho certifik·tu Ëasovej peËiatky voËi Ëasu UtcNow a voËi platnÈmu poslednÈmu CRL.
+	        */
+	        	public String verifie() 
+	        	{
+	        		StringBuilder returnValue = new StringBuilder();
+
+	                X509CRL crl = getCrl();
+	        		
+	        		X509CertificateHolder signer = null;
+	        		
+	        		TimeStampToken token = getToken();
+	        		
+	        		Store<X509CertificateHolder> certHolders = token.getCertificates();
+	        		ArrayList<X509CertificateHolder> certList = new ArrayList<>(certHolders.getMatches(null));
+
+	        		BigInteger serialNumToken = token.getSID().getSerialNumber();
+	        		X500Name issuerToken = token.getSID().getIssuer();
+
+	        		for (X509CertificateHolder certHolder : certList) {
+	        			if (certHolder.getSerialNumber().equals(serialNumToken) && certHolder.getIssuer().equals(issuerToken)){
+	        				signer = certHolder;
+	        				break;
+	        			}
+	        		}
+
+	        		if (signer == null){
+	        			returnValue.append("Ch˝ba certifik·t Ëasovej peËiatky.");
+	        		}
+
+	        		if (!signer.isValidOn(new Date())){
+	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi UtcNow Ëasu.");
+	        		}
+
+	        		if (crl.getRevokedCertificate(signer.getSerialNumber()) != null){
+	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi platnÈmu poslednÈmu CRL.");
+	        		}
+
+	        		return returnValue.toString();
+	        	}
+	        },
+	        new Rule()
+	        {
+	       /* Overenie Ëasovej peËiatky:
+			* overenie MessageImprint z Ëasovej peËiatky voËi podpisu ds:SignatureValue
+	        */
+	        	public String verifie() 
+	        	{
+	        		StringBuilder returnValue = new StringBuilder();
+	        		
+	        		TimeStampToken token = getToken();
+	        		
+	        		byte[] messageImprint = token.getTimeStampInfo().getMessageImprintDigest();
+	        		String hashAlg = token.getTimeStampInfo().getHashAlgorithm().getAlgorithm().getId();
+
+	        		byte[] signature = Base64.getDecoder().decode(parsedDoc.getElementsByTagName("xades:EncapsulatedTimeStamp").item(0).getTextContent().getBytes());
+	        		
+	        		MessageDigest messageDigest = null;
+        			try {
+						messageDigest = MessageDigest.getInstance(hashAlg, "BC");
+						if (!MessageDigest.isEqual(messageImprint, messageDigest.digest(signature))){
+		        			returnValue.append("MessageImprint z Ëasovej peËiatky a podpis ds:SignatureValue sa nezhoduj˙.");
+		        		}
+					} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+						returnValue.append("Zl˝ algoritmus v MD.");
+					}
+	        		
+	        		return returnValue.toString();
+	        	}
+	        },
+	        new Rule()
+	        {
+	       /* Overenie platnosti podpisovÈho certifik·tu:
+			* overenie platnosti podpisovÈho certifik·tu dokumentu voËi Ëasu T z Ëasovej peËiatky a voËi platnÈmu poslednÈmu CRL.
+	        */
+	        	public String verifie() 
+	        	{
+	        		StringBuilder returnValue = new StringBuilder();
+	        		
+	        		X509CertificateObject cert = null;
+	        		ASN1InputStream asn1is = null;
+	        		X509CRL crl = getCrl();
+	        		TimeStampToken token = getToken();
+	        		
+        			asn1is = new ASN1InputStream(new ByteArrayInputStream(Base64.getDecoder().decode(parsedDoc.getElementsByTagName("ds:X509Certificate").item(0).getTextContent())));
+        			ASN1Sequence sq = null;
+					try {
+						sq = (ASN1Sequence) asn1is.readObject();
+						cert = new X509CertificateObject(Certificate.getInstance(sq));
+					} catch (IOException | CertificateParsingException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							asn1is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+
+					try {
+						cert.checkValidity(token.getTimeStampInfo().getGenTime());
+					} catch (CertificateExpiredException | CertificateNotYetValidException e) {
+						returnValue.append("Certifik·t nie je platn˝ voËi Ëasu T z Ëasovej peËiatky.");
+					}
+
+	        		X509CRLEntry entry = crl.getRevokedCertificate(cert.getSerialNumber());
+	        		if (entry != null && entry.getRevocationDate().before(token.getTimeStampInfo().getGenTime())) {
+	        			returnValue.append("Certifik·t nie je platn˝ voËi poslednÈmu CRL.");
+	        		}
+
+	        		return returnValue.toString();
+	        	}
 	        }
 	    };
 	
@@ -617,7 +753,7 @@ public class Validator {
 	//inspired by https://www.programcreek.com/java-api-examples/index.php?api=org.bouncycastle.jce.provider.X509CertificateObject
 	
 	private X509CertificateObject loadCertificate(Node X509Certificate) throws IOException, GeneralSecurityException {
-		InputStream in = new ByteArrayInputStream(Base64.decode(X509Certificate.getTextContent()));
+		InputStream in = new ByteArrayInputStream(Base64.getDecoder().decode(X509Certificate.getTextContent()));
 	    ASN1InputStream derin = new ASN1InputStream(in);
 	    ASN1Primitive certInfo = derin.readObject();
 	    derin.close();
@@ -659,6 +795,39 @@ public class Validator {
 		canonicalizationMethods.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
 		
 		return canonicalizationMethods;
+	}
+	
+	private TimeStampToken getToken() {
+		TimeStampToken token = null;
+		try {
+			token = new TimeStampToken(new CMSSignedData(Base64.getDecoder().decode
+					(parsedDoc.getElementsByTagName("xades:EncapsulatedTimeStamp").item(0).getTextContent())));
+		} catch (DOMException | TSPException | IOException | CMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return token;
+	}
+	
+	private X509CRL getCrl() {
+		URL url = null;
+        InputStream iStream = null;
+        X509CRL crl = null;
+		try {
+        	url = new URL("http://test.ditec.sk/DTCCACrl/DTCCACrl.crl");	//cviËenie 2 - crl.txt, od nich m·me ten certifik·t
+        	iStream = url.openStream();
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            crl = (X509CRL) factory.generateCRL(iStream);
+        } catch (CertificateException | IOException | CRLException e) {
+			e.printStackTrace();
+		} finally {
+        	try {
+				iStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+		return crl;
 	}
 	
 		

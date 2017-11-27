@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Base64;
  
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -40,7 +41,7 @@ import org.bouncycastle.asn1.ASN1String;
  * 
  * @author Svetlin Nakov
  */
-public class timeStampVerifie{
+public class TimeStampVerifie{
  
     /**
      * Extracts the CRL distribution points from the certificate (if available)
