@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
@@ -27,10 +28,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.xml.crypto.AlgorithmMethod;
 import javax.xml.crypto.KeySelector;
@@ -55,6 +58,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -73,6 +77,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
@@ -82,6 +88,9 @@ import sun.security.provider.certpath.OCSP;
 public class Validator {
 	private  Document parsedDoc;
 	private XPath xpath;
+	
+	//everything
+	//https://www.ditec.sk/ep/signature_formats/xades_zep/v1.1/GOV_ZEP.75.3.170522.Profil_XAdES_ZEP_v1.1_-_format_ZEP_na_baze_XAdES.PDF
 	
 	private Rule[] rules = new Rule[] {
 			
@@ -178,12 +187,174 @@ public class Validator {
 	        new Rule()
 	        {
 	        	/*Core validation (podæa öpecifik·cie XML Signature) ñ overenie hodnoty podpisu ds:SignatureValue a referenciÌ v ds:SignedInfo:
-	        		-	dereferencovanie URI, kanonikaliz·cia referencovan˝ch ds:Manifest elementov a overenie hodnÙt odtlaËkov ds:DigestValue,
+	        		-	dereferencovanie URI, kanonikaliz·cia referencovan˝ch ds:Manifest elementov a overenie hodnÙt odtlaËkov ds:DigestValue*/
+	        	public String verifie() 
+	        	{
+	        		StringBuilder returnValue = new StringBuilder();
+	        		
+	        		Element signatureElement = (Element) parsedDoc.getElementsByTagName("ds:Signature").item(0);
+	        		Element signatureInfoElement = (Element) signatureElement.getElementsByTagName("ds:SignedInfo").item(0);
+	        		NodeList referenceElements =  signatureInfoElement.getElementsByTagName("ds:Reference");
+	        		
+	        		int i = 0;
+	        		while (i<referenceElements.getLength()){
+	        			Element refElement = (Element) referenceElements.item(i);
+	        			
+	        			Element manEl = null;
+	        			
+	        			//dereferencovanie URI
+	        			NodeList allManifests =  parsedDoc.getElementsByTagName("ds:Manifest");
+	        			for (int k=0;k<allManifests.getLength();k++) {
+	        				Element manifest = (Element) allManifests.item(k);
+	        				if (manifest.hasAttribute("URI") && refElement.getAttribute("URI").substring(1).equals(manifest.getAttribute("URI"))) {
+	        					manEl = manifest;
+	        				}
+	        			}
+	        				
+	        			if (manEl == null) {
+	        				returnValue.append("Core valid·cia: K URI: " + refElement.getAttribute("URI").substring(1) + " ch˝ba manifest element.");
+	        			} else {
+	        			
+		        			Element digestMethodElement = (Element) refElement.getElementsByTagName("ds:DigestMethod").item(0);
+		        			
+		        			//4.5 identifik·tory MD
+		        			Map<String, String> possibleDM = new HashMap<String, String>();
+		        			possibleDM.put("http://www.w3.org/2000/09/xmldsig#sha1", "SHA-1");
+		        			possibleDM.put("http://www.w3.org/2001/04/xmldsigmore#sha224", "SHA-224");
+		        			possibleDM.put("http://www.w3.org/2001/04/xmlenc#sha256", "SHA-256");
+		        			possibleDM.put("http://www.w3.org/2001/04/xmldsigmore#sha384", "SHA-384");
+		        			possibleDM.put("http://www.w3.org/2001/04/xmlenc#sha512", "SHA-512");
+		        			
+		        			if (!possibleDM.containsKey(digestMethodElement.getAttribute("Algorithm"))) {
+		        				returnValue.append("Core valid·cia: Element ds:DigestMethod v reference elemente obsahuje nepodporovan˝ algoritmus.");
+		        			}
+		        			
+		        			DOMImplementationLS lsImpl = (DOMImplementationLS)manEl.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+		        			LSSerializer serializer = lsImpl.createLSSerializer();
+		        			serializer.getDomConfig().setParameter("xml-declaration", false);
+		        			byte[] manElBytes = serializer.writeToString(manEl).getBytes();
+		        			
+		        			NodeList transformsList = manEl.getElementsByTagName("ds:Transforms");
+		        			
+		        			int j = 0;
+		        			while (j<transformsList.getLength()) {
+		        				
+		        				Element listItem = (Element) transformsList.item(j);
+		        				Element transElem = (Element) listItem.getElementsByTagName("ds:Transform").item(0);
+		        				
+		        				if (transElem.getAttribute("Algorithm").equals(getTransformString())) {
+		        					Canonicalizer c;
+		        					try {
+		        						c = Canonicalizer.getInstance(transElem.getAttribute("Algorithm"));
+		        						manElBytes = c.canonicalize(manElBytes);
+		        					} catch (Exception e) {
+		        						returnValue.append("Core valid·cia: Nepodarilo sa kanonikalizovaù manifest element.");
+		        					}
+		        				} else {
+		        					returnValue.append("Core valid·cia: Nepodporovan· transformaËn· metÛda.");
+		        				}
+		        				j++;
+		        			}
+		        			
+		        			MessageDigest messageDigest = null;
+		        			
+		        			try {
+		        				messageDigest = MessageDigest.getInstance(possibleDM.get(digestMethodElement.getAttribute("Algorithm")));
+		        				
+		        			} catch (NoSuchAlgorithmException e) {
+		        				returnValue.append("Core valid·cia: Nepodporovan˝ DM algoritmus.");
+		        			}
+		        			
+		        			//podpis, expected vs actual
+		        			if (refElement.getElementsByTagName("ds:DigestValue").item(0).getTextContent()
+		        					.equals(Base64.getEncoder().encode(messageDigest.digest(manElBytes)).toString()) == false) {
+		        				
+		        				returnValue.append("Core valid·cia: Porovn·vanÈ odtlaËky sa nerovnaj˙.");
+		        			}
+	        			}
+	        			i++;
+	        		}
+
+	        		return returnValue.toString();
+	        	}
+	        	
+	        },
+	        new Rule()
+	        {
+	        	/*Core validation (podæa öpecifik·cie XML Signature) ñ overenie hodnoty podpisu ds:SignatureValue a referenciÌ v ds:SignedInfo:
 	        		-	kanonikaliz·cia ds:SignedInfo a overenie hodnoty ds:SignatureValue pomocou pripojenÈho podpisovÈho certifik·tu v ds:KeyInfo,*/
 	        	public String verifie() 
 	        	{
-	        		//under construction
-	        		return "";
+	        		StringBuilder returnValue = new StringBuilder();
+	        		Element sigElem = (Element) parsedDoc.getElementsByTagName("ds:Signature").item(0);
+	        		Element sigValElem = (Element) sigElem.getElementsByTagName("ds:SignatureValue").item(0);
+	        		
+	        		Element sigInfElem = (Element) sigElem.getElementsByTagName("ds:SignedInfo").item(0);
+	        		Element canonnMethodElem = (Element) sigInfElem.getElementsByTagName("ds:CanonicalizationMethod").item(0);
+	        		Element sigMethodElem = (Element) sigInfElem.getElementsByTagName("ds:SignatureMethod").item(0);
+	        		
+	        		DOMImplementationLS lsImpl = (DOMImplementationLS)sigInfElem.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+        			LSSerializer serializer = lsImpl.createLSSerializer();
+        			serializer.getDomConfig().setParameter("xml-declaration", false);
+        			byte[] sigInfElBytes = serializer.writeToString(sigInfElem).getBytes();
+	        		
+        			Canonicalizer c;
+	        		try {
+	        			c = Canonicalizer.getInstance(canonnMethodElem.getAttribute("Algorithm"));
+	        			sigInfElBytes = c.canonicalize(sigInfElBytes);
+	        			
+	        		} catch (Exception e) {
+						returnValue.append("Core valid·cia: Nepodarilo sa kanonikalizovaù SignatureInfo element.");
+					}
+	        		
+	        		//ziskaj certifik·t
+	        		X509CertificateObject cert = null;
+	        		ASN1InputStream asn1is = null;
+        			ASN1Sequence sq = null;
+					try {
+						asn1is = new ASN1InputStream(new ByteArrayInputStream(Base64.getDecoder().decode(parsedDoc.getElementsByTagName("ds:X509Certificate").item(0).getTextContent())));
+						sq = (ASN1Sequence) asn1is.readObject();
+						cert = new X509CertificateObject(Certificate.getInstance(sq));
+					} catch (IOException | CertificateParsingException e) {
+						returnValue.append("Core valid·cia: Nepodarilo sa n·jsù certifik·t v elemente KeyInfo.");
+					} finally {
+						try {
+							asn1is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+
+	        		//4.5 identifik·tory signature method
+        			Map<String, String> possibleSM = new HashMap<String, String>();
+        			possibleSM.put("http://www.w3.org/2000/09/xmldsig#dsa-sha1", "SHA1withDSA");
+        			possibleSM.put("http://www.w3.org/2000/09/xmldsig#rsa-sha1", "SHA1withRSA/ISO9796-2");
+        			possibleSM.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", "SHA256withRSA");
+        			possibleSM.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384", "SHA384withRSA");
+        			possibleSM.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", "SHA512withRSA");
+	        		
+        			java.security.Signature signer = null;
+	        		try {
+	        			signer = java.security.Signature.getInstance(possibleSM.get(sigMethodElem.getAttribute("Algorithm")));
+	        			signer.initVerify(cert.getPublicKey());
+	        			signer.update(sigInfElBytes);
+	        			
+	        		} catch (Exception e) {
+	        			returnValue.append("Core valid·cia: Nepodarilo sa inicializovaù tvorbu overovacieho podpisu.");
+	        		}
+	        		
+	        		boolean verificatedGood = false;
+	        		
+	        		try {
+	        			verificatedGood = signer.verify(Base64.getDecoder().decode(sigValElem.getTextContent().getBytes()));
+	        		} catch (SignatureException e) {
+	        			returnValue.append("Core valid·cia: Nepodarilo sa verifikovaù podpis.");
+	        		}
+	        		
+	        		if (verificatedGood == false) {
+	        			returnValue.append("Core valid·cia: PodpÌsanÈ SignedInfo a SignatureValue sa nezhoduj˙.");
+	        		}
+	        		return returnValue.toString();
 	        	}
 	        	
 	        },
@@ -479,15 +650,15 @@ public class Validator {
 	        		return returnValue;
 	        	}        	
 	        },
-	        new Rule()
-	        {
+	        //new Rule()
+	        //{
 	       /* Core validation (podæa öpecifik·cie XML Signature) ñ overenie hodnoty podpisu ds:SignatureValue a referenciÌ v ds:SignedInfo:
 			* dereferencovanie URI, kanonikaliz·cia referencovan˝ch ds:Manifest elementov a overenie hodnÙt odtlaËkov ds:DigestValue,
 			* kanonikaliz·cia ds:SignedInfo a overenie hodnoty ds:SignatureValue pomocou pripojenÈho podpisovÈho certifik·tu v ds:KeyInfo,
 	        */
-	        	public String verifie() 
+	        	/*public String verifie() 
 	        	{
-	        		/*String returnValue = "";
+	        		String returnValue = "";
 	        		CertificateFactory cf;
 	        		
 					try {
@@ -561,10 +732,9 @@ public class Validator {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					*/
 	        		return "";
 	        	}	 
-	        },
+	        },*/
 	        new Rule()
 	        {
 	       /* Overenie Ëasovej peËiatky:
@@ -594,15 +764,15 @@ public class Validator {
 	        		}
 
 	        		if (signer == null){
-	        			returnValue.append("Ch˝ba certifik·t Ëasovej peËiatky.");
+	        			returnValue.append("Ch˝ba certifik·t Ëasovej peËiatky.\n");
 	        		}
 
 	        		if (!signer.isValidOn(new Date())){
-	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi UtcNow Ëasu.");
+	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi UtcNow Ëasu.\n");
 	        		}
 
 	        		if (crl.getRevokedCertificate(signer.getSerialNumber()) != null){
-	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi platnÈmu poslednÈmu CRL.");
+	        			returnValue.append("Podpisov˝ certifik·t Ëasovej peËiatky nie je platn˝ voËi platnÈmu poslednÈmu CRL.\n");
 	        		}
 
 	        		return returnValue.toString();
@@ -628,10 +798,10 @@ public class Validator {
         			try {
 						messageDigest = MessageDigest.getInstance(hashAlg, "BC");
 						if (!MessageDigest.isEqual(messageImprint, messageDigest.digest(signature))){
-		        			returnValue.append("MessageImprint z Ëasovej peËiatky a podpis ds:SignatureValue sa nezhoduj˙.");
+		        			returnValue.append("MessageImprint z Ëasovej peËiatky a podpis ds:SignatureValue sa nezhoduj˙.\n");
 		        		}
 					} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-						returnValue.append("Zl˝ algoritmus v MD.");
+						returnValue.append("Overenie Ëasovej peËiatky: Nepodporovan˝ messageDigest algoritmus v tokene pri porovn·vanÌ s MessageImprint.\n");
 					}
 	        		
 	        		return returnValue.toString();
@@ -669,12 +839,12 @@ public class Validator {
 					try {
 						cert.checkValidity(token.getTimeStampInfo().getGenTime());
 					} catch (CertificateExpiredException | CertificateNotYetValidException e) {
-						returnValue.append("Certifik·t nie je platn˝ voËi Ëasu T z Ëasovej peËiatky.");
+						returnValue.append("Certifik·t nie je platn˝ voËi Ëasu T z Ëasovej peËiatky.\n");
 					}
 
 	        		X509CRLEntry entry = crl.getRevokedCertificate(cert.getSerialNumber());
 	        		if (entry != null && entry.getRevocationDate().before(token.getTimeStampInfo().getGenTime())) {
-	        			returnValue.append("Certifik·t nie je platn˝ voËi poslednÈmu CRL.");
+	        			returnValue.append("Certifik·t nie je platn˝ voËi poslednÈmu CRL.\n");
 	        		}
 
 	        		return returnValue.toString();
@@ -779,6 +949,10 @@ public class Validator {
 		return transform;
 	}
 	
+	private String getTransformString() {
+		return "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+	}
+	
 	private Set<String> getSignature() {
 		Set<String> signatureMethods = new HashSet<String>();
 		signatureMethods.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1"); 
@@ -792,7 +966,7 @@ public class Validator {
 	
 	private Set<String> getCanonicalization() {
 		Set<String> canonicalizationMethods = new HashSet<String>();
-		canonicalizationMethods.add("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+		canonicalizationMethods.add(getTransformString());
 		
 		return canonicalizationMethods;
 	}
