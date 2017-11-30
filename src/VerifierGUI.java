@@ -41,13 +41,13 @@ public class VerifierGUI extends JDialog {
 	 */
 	public VerifierGUI() {
 		setTitle("Overovaè");
-		setBounds(100, 100, 869, 300);
+		setBounds(100, 100, 869, 468);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		JTextArea verifier_textArea = new JTextArea();
-		verifier_textArea.setBounds(10, 84, 833, 144);
+		verifier_textArea.setBounds(10, 84, 833, 301);
 		contentPanel.add(verifier_textArea);
 		
 		JLabel lblNewLabel = new JLabel("Výsledok overenia");

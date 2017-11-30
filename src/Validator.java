@@ -55,6 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -200,19 +201,31 @@ public class Validator {
 	        		while (i<referenceElements.getLength()){
 	        			Element refElement = (Element) referenceElements.item(i);
 	        			
+	        			XPath xpath = XPathFactory.newInstance().newXPath();
+	        			NodeList nodeList = null;
+						try {
+							nodeList = (NodeList) xpath.compile("//*[@Id='" + refElement.getAttribute("URI").substring(1) + "']")
+									.evaluate(parsedDoc, XPathConstants.NODESET);
+						} catch (XPathExpressionException e1) {
+							e1.printStackTrace();
+						}
+	        			
+	        			if (nodeList.getLength() == 0) {
+	        				returnValue.append("Neúspešné dereferencovanie URI: " + refElement.getAttribute("URI").substring(1)+ "\n");
+	        			}
+	        			
 	        			Element manEl = null;
 	        			
-	        			//dereferencovanie URI
+	        			//dereferencovanie URI pre manifest
 	        			NodeList allManifests =  parsedDoc.getElementsByTagName("ds:Manifest");
 	        			for (int k=0;k<allManifests.getLength();k++) {
 	        				Element manifest = (Element) allManifests.item(k);
-	        				if (manifest.hasAttribute("URI") && refElement.getAttribute("URI").substring(1).equals(manifest.getAttribute("URI"))) {
+	        				if (manifest.hasAttribute("Id") && refElement.getAttribute("URI").substring(1).equals(manifest.getAttribute("Id"))) {
 	        					manEl = manifest;
 	        				}
 	        			}
 	        				
 	        			if (manEl == null) {
-	        				returnValue.append("Core validácia: K URI: " + refElement.getAttribute("URI").substring(1) + " chýba manifest element.");
 	        			} else {
 	        			
 		        			Element digestMethodElement = (Element) refElement.getElementsByTagName("ds:DigestMethod").item(0);
@@ -226,7 +239,7 @@ public class Validator {
 		        			possibleDM.put("http://www.w3.org/2001/04/xmlenc#sha512", "SHA-512");
 		        			
 		        			if (!possibleDM.containsKey(digestMethodElement.getAttribute("Algorithm"))) {
-		        				returnValue.append("Core validácia: Element ds:DigestMethod v reference elemente obsahuje nepodporovaný algoritmus.");
+		        				returnValue.append("Core validácia: Element ds:DigestMethod v reference elemente obsahuje nepodporovaný algoritmus.\n");
 		        			}
 		        			
 		        			DOMImplementationLS lsImpl = (DOMImplementationLS)manEl.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
@@ -242,16 +255,18 @@ public class Validator {
 		        				Element listItem = (Element) transformsList.item(j);
 		        				Element transElem = (Element) listItem.getElementsByTagName("ds:Transform").item(0);
 		        				
+		        				org.apache.xml.security.Init.init();
+		        				
 		        				if (transElem.getAttribute("Algorithm").equals(getTransformString())) {
 		        					Canonicalizer c;
 		        					try {
 		        						c = Canonicalizer.getInstance(transElem.getAttribute("Algorithm"));
 		        						manElBytes = c.canonicalize(manElBytes);
 		        					} catch (Exception e) {
-		        						returnValue.append("Core validácia: Nepodarilo sa kanonikalizova manifest element.");
+		        						returnValue.append("Core validácia: Nepodarilo sa kanonikalizova manifest element.\n");
 		        					}
 		        				} else {
-		        					returnValue.append("Core validácia: Nepodporovaná transformaèná metóda.");
+		        					returnValue.append("Core validácia: Nepodporovaná transformaèná metóda.\n");
 		        				}
 		        				j++;
 		        			}
@@ -262,14 +277,13 @@ public class Validator {
 		        				messageDigest = MessageDigest.getInstance(possibleDM.get(digestMethodElement.getAttribute("Algorithm")));
 		        				
 		        			} catch (NoSuchAlgorithmException e) {
-		        				returnValue.append("Core validácia: Nepodporovaný DM algoritmus.");
+		        				returnValue.append("Core validácia: Nepodporovaný DM algoritmus.\n");
 		        			}
 		        			
 		        			//podpis, expected vs actual
 		        			if (refElement.getElementsByTagName("ds:DigestValue").item(0).getTextContent()
-		        					.equals(Base64.getEncoder().encode(messageDigest.digest(manElBytes)).toString()) == false) {
-		        				
-		        				returnValue.append("Core validácia: Porovnávané odtlaèky sa nerovnajú.");
+		        					.equals(new String(Base64.getEncoder().encode(messageDigest.digest(manElBytes)))) == false) {
+		        				returnValue.append("Core validácia: Porovnávané odtlaèky sa nerovnajú.\n");
 		        			}
 	        			}
 	        			i++;
@@ -298,13 +312,16 @@ public class Validator {
         			serializer.getDomConfig().setParameter("xml-declaration", false);
         			byte[] sigInfElBytes = serializer.writeToString(sigInfElem).getBytes();
 	        		
+        			org.apache.xml.security.Init.init();
+        			
         			Canonicalizer c;
 	        		try {
 	        			c = Canonicalizer.getInstance(canonnMethodElem.getAttribute("Algorithm"));
 	        			sigInfElBytes = c.canonicalize(sigInfElBytes);
 	        			
 	        		} catch (Exception e) {
-						returnValue.append("Core validácia: Nepodarilo sa kanonikalizova SignatureInfo element.");
+	        			System.out.println(e);
+						returnValue.append("Core validácia: Nepodarilo sa kanonikalizova SignatureInfo element.\n");
 					}
 	        		
 	        		//ziskaj certifikát
@@ -316,7 +333,7 @@ public class Validator {
 						sq = (ASN1Sequence) asn1is.readObject();
 						cert = new X509CertificateObject(Certificate.getInstance(sq));
 					} catch (IOException | CertificateParsingException e) {
-						returnValue.append("Core validácia: Nepodarilo sa nájs certifikát v elemente KeyInfo.");
+						returnValue.append("Core validácia: Nepodarilo sa nájs certifikát v elemente KeyInfo.\n");
 					} finally {
 						try {
 							asn1is.close();
@@ -340,19 +357,21 @@ public class Validator {
 	        			signer.update(sigInfElBytes);
 	        			
 	        		} catch (Exception e) {
-	        			returnValue.append("Core validácia: Nepodarilo sa inicializova tvorbu overovacieho podpisu.");
+	        			returnValue.append("Core validácia: ds:SignatureMethod obsahuje neplatný algoritmus, preto sa nepodarilo inicializova tvorbu overovacieho podpisu .\n");
 	        		}
 	        		
-	        		boolean verificatedGood = false;
-	        		
-	        		try {
-	        			verificatedGood = signer.verify(Base64.getDecoder().decode(sigValElem.getTextContent().getBytes()));
-	        		} catch (SignatureException e) {
-	        			returnValue.append("Core validácia: Nepodarilo sa verifikova podpis.");
-	        		}
-	        		
-	        		if (verificatedGood == false) {
-	        			returnValue.append("Core validácia: Podpísané SignedInfo a SignatureValue sa nezhodujú.");
+	        		if (signer != null) {
+		        		boolean verificatedGood = false;
+		        		
+		        		try {
+		        			verificatedGood = signer.verify(Base64.getDecoder().decode(sigValElem.getTextContent().getBytes()));
+		        		} catch (SignatureException e) {
+		        			returnValue.append("Core validácia: Nepodarilo sa verifikova podpis.\n");
+		        		}
+		        		
+		        		if (verificatedGood == false) {
+		        			returnValue.append("Core validácia: Podpísané SignedInfo a SignatureValue sa nezhodujú.\n");
+		        		}
 	        		}
 	        		return returnValue.toString();
 	        	}
@@ -587,17 +606,21 @@ public class Validator {
 	        					|| property1.getFirstChild().getNodeName().compareTo("xzep:ProductInfos") == 0
 	        					&& property2.getFirstChild().getNodeName().compareTo("xzep:SignatureVersion") == 0)
 	        			{
-	        				String signatureId = parsedDoc.getElementsByTagName("ds:Signature").item(0).getAttributes().getNamedItem("Id").getNodeValue();
-	        				String property1Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
-	        				String property2Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
-	        				if (!(signatureId != null && property1Target != null && property2Target != null
-	        						&& signatureId.compareTo(property1Target) == 0
-	        						&& signatureId.compareTo(property2Target) == 0)) 
-	        				{
-	        					System.out.println(signatureId);
-	        					System.out.println(property1Target);
-	        					System.out.println(property2Target);
-	        					returnValue += "obidva ds:SignatureProperty musia ma atribút Target nastavený na ds:Signature";
+	        				try {
+		        				String signatureId = parsedDoc.getElementsByTagName("ds:Signature").item(0).getAttributes().getNamedItem("Id").getNodeValue();
+		        				String property1Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
+		        				String property2Target = property1.getAttributes().getNamedItem("Target").getNodeValue().substring(1);
+		        				if (!(signatureId != null && property1Target != null && property2Target != null
+		        						&& signatureId.compareTo(property1Target) == 0
+		        						&& signatureId.compareTo(property2Target) == 0)) 
+		        				{
+		        					System.out.println(signatureId);
+		        					System.out.println(property1Target);
+		        					System.out.println(property2Target);
+		        					returnValue += "obidva ds:SignatureProperty musia ma atribút Target nastavený na ds:Signature";
+		        				}
+	        				} catch (Exception e1) {
+	        					returnValue += "Signature element neobsahuje atribút Id";
 	        				}
 	        			}
 	        			else 
@@ -650,91 +673,122 @@ public class Validator {
 	        		return returnValue;
 	        	}        	
 	        },
-	        //new Rule()
-	        //{
-	       /* Core validation (pod¾a špecifikácie XML Signature) – overenie hodnoty podpisu ds:SignatureValue a referencií v ds:SignedInfo:
-			* dereferencovanie URI, kanonikalizácia referencovaných ds:Manifest elementov a overenie hodnôt odtlaèkov ds:DigestValue,
-			* kanonikalizácia ds:SignedInfo a overenie hodnoty ds:SignatureValue pomocou pripojeného podpisového certifikátu v ds:KeyInfo,
-	        */
-	        	/*public String verifie() 
+	        new Rule()
+	        {
+	        	/*
+	        	 * overenie referencií v elementoch ds:Manifest:
+				 * dereferencovanie URI, aplikovanie príslušnej ds:Transforms transformácie (pri base64 decode),
+				 * overenie hodnoty ds:DigestValue,
+	        	 */
+	        	public String verifie() 
 	        	{
-	        		String returnValue = "";
-	        		CertificateFactory cf;
+	        		StringBuilder returnValue = new StringBuilder();
 	        		
-					try {
-						cf = CertificateFactory.getInstance("X.509");
+	        		ArrayList<Element> references = new ArrayList<Element>();
+	        		
+	        		NodeList manifests = parsedDoc.getElementsByTagName("ds:Manifest");
+	        		       		
+	        		//najdi všetky referencie v manifestoch
+	        		for(int i = 0; i < manifests.getLength(); i++) {
+	        			NodeList childrens = manifests.item(i).getChildNodes();
+	        			for (int j = 0; j < childrens.getLength(); j++) {
+	        				if (childrens.item(j).getNodeName().compareTo("ds:Reference") == 0) 
+	        				{
+	        					references.add((Element)childrens.item(j));
+	        				}
+	        			}
+	        		}	
+	        		
+	        		for (int i=0;i<references.size();i++) {
+	        			Element refElement = references.get(i);
+	        			
+	        			Element objEl = null;
+	        			
+	        			//dereferencovanie URI pre manifest
+	        			NodeList allObjects =  parsedDoc.getElementsByTagName("ds:Object");
+	        			for (int k=0;k<allObjects.getLength();k++) {
+	        				Element object = (Element) allObjects.item(k);
+	        				if (object.hasAttribute("Id") && refElement.getAttribute("URI").substring(1).equals(object.getAttribute("Id"))) {
+	        					objEl = object;
+	        				}
+	        			}
+	        			
+	        			//iba ak našiel objekt s daným ID
+	        			if (objEl == null) {
+	        				returnValue.append("Pri dereferencovaní referencii v manifest elementoch sa nenašiel objekt s Id: " + refElement.getAttribute("URI").substring(1) + "\n");
+	        			} else {
+	        			
+		        			Element digestMethodElement = (Element) refElement.getElementsByTagName("ds:DigestMethod").item(0);     			
+		        			
+		        			NodeList transformsList = refElement.getElementsByTagName("ds:Transforms");
+		        			
+		        			//overujem DigestValue pre všetky transformy
+		        			int j = 0;
+		        			while (j<transformsList.getLength()) {
 
-		        	    FileInputStream in;
-		        	    in = new FileInputStream("eeccrca.crl");
-		        	    X509CRL crl = (X509CRL) cf.generateCRL(in);
-		        	    Set s = crl.getRevokedCertificates();
-		        	    
-					} catch (CertificateException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}						
-					catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (CRLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	        	    
-	        	    
-	        		return "lol";*/
-	        		// Validate the XMLSignature.
-	        		/*try {
-		        		// Find Signature element.
-
-		        		// Find Signature element.
-		        		NodeList nl =
-		        		    parsedDoc.getElementsByTagNameNS("*", "Signature");
-		        		if (nl.getLength() == 0) {
-		        		    throw new Exception("Cannot find Signature element");
-		        		}
-
-		        		// Create a DOMValidateContext and specify a KeySelector
-		        		// and document context.
-		        		DOMValidateContext valContext = new DOMValidateContext
-		        	            (new KeyValueKeySelector(), nl.item(0));
-
-		        		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-		        		// Unmarshal the XMLSignature.
-		        		javax.xml.crypto.dsig.XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-		        		
-		        		
-						boolean coreValidity = signature.validate(valContext);
-
-						// Check core validation status.
-						if (coreValidity == false) {
-						    System.err.println("Signature failed core validation");
-						    boolean sv = signature.getSignatureValue().validate(valContext);
-						    System.out.println("signature validation status: " + sv);
-						    if (sv == false) {
-						        // Check the validation status of each Reference.
-						        Iterator i = signature.getSignedInfo().getReferences().iterator();
-						        for (int j=0; i.hasNext(); j++) {
-						            boolean refValid = ((Reference) i.next()).validate(valContext);
-						            System.out.println("ref["+j+"] validity status: " + refValid);
-						        }
-						    }
-						} else {
-						    System.out.println("Signature passed core validation");
-						}
-					} catch (XMLSignatureException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (MarshalException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	        		return "";
+		        				Element listItem = (Element) transformsList.item(j);
+		        				Element transElem = (Element) listItem.getElementsByTagName("ds:Transform").item(0);
+		        				
+		        				DOMImplementationLS lsImpl = (DOMImplementationLS)objEl.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+		        				LSSerializer serializer = lsImpl.createLSSerializer();
+		        				serializer.getDomConfig().setParameter("xml-declaration", false);
+		        				byte[] objnElBytes = serializer.writeToString(objEl).getBytes();
+		        				
+		        				org.apache.xml.security.Init.init();
+		        				
+		        				if (transElem.getAttribute("Algorithm").equals(getTransformString())) {
+		        					Canonicalizer c;
+		        					try {
+		        						c = Canonicalizer.getInstance(transElem.getAttribute("Algorithm"));
+		        						objnElBytes = c.canonicalize(objnElBytes);
+		        					} catch (Exception e) {
+		        						System.out.println(e);
+		        						returnValue.append("Nepodarilo sa kanonikalizova ds:Object element.\n");
+		        						returnValue.append(e + "\n");
+		        					}
+		        				}
+		        				
+		        				//pri base64 dekodujeme
+		        				if (transElem.getAttribute("Algorithm").equals("http://www.w3.org/2000/09/xmldsig#base64")) {
+		        					objnElBytes = Base64.getDecoder().decode(objnElBytes);
+		        				}
+		        				
+		        				//4.5 identifikátory MD
+			        			Map<String, String> possibleDM = new HashMap<String, String>();
+			        			possibleDM.put("http://www.w3.org/2000/09/xmldsig#sha1", "SHA-1");
+			        			possibleDM.put("http://www.w3.org/2001/04/xmldsigmore#sha224", "SHA-224");
+			        			possibleDM.put("http://www.w3.org/2001/04/xmlenc#sha256", "SHA-256");
+			        			possibleDM.put("http://www.w3.org/2001/04/xmldsigmore#sha384", "SHA-384");
+			        			possibleDM.put("http://www.w3.org/2001/04/xmlenc#sha512", "SHA-512");  
+			        			
+			        			MessageDigest messageDigest = null;
+			        			
+			        			try {
+			        				messageDigest = MessageDigest.getInstance(possibleDM.get(digestMethodElement.getAttribute("Algorithm")));
+			        				
+			        			} catch (NoSuchAlgorithmException e) {
+			        				returnValue.append("Subvalidácia: Nepodporovaný DM algoritmus.\n");
+			        			}
+			        			
+			        			if (messageDigest != null) {
+				        			//podpis, expected vs actual
+				        			if (refElement.getElementsByTagName("ds:DigestValue").item(0).getTextContent()
+				        					.equals(new String(Base64.getEncoder().encode(messageDigest.digest(objnElBytes)).toString())) == false) {
+				        				
+				        				returnValue.append("Subvalidácia: DigestValue v elemente Reference sa nezhoduje s hodnotou vypoèítanou z Object elementu.\n");
+				        			}
+			        			}
+		        				j++;
+		        			}
+		        			
+		        			
+	        			}
+	        		}
+	        		
+					return returnValue.toString();
+	        		
 	        	}	 
-	        },*/
+	        },
 	        new Rule()
 	        {
 	       /* Overenie èasovej peèiatky:
@@ -792,15 +846,15 @@ public class Validator {
 	        		byte[] messageImprint = token.getTimeStampInfo().getMessageImprintDigest();
 	        		String hashAlg = token.getTimeStampInfo().getHashAlgorithm().getAlgorithm().getId();
 
-	        		byte[] signature = Base64.getDecoder().decode(parsedDoc.getElementsByTagName("xades:EncapsulatedTimeStamp").item(0).getTextContent().getBytes());
+	        		byte[] signature = Base64.getDecoder().decode(parsedDoc.getElementsByTagName("ds:SignatureValue").item(0).getTextContent().getBytes());
 	        		
 	        		MessageDigest messageDigest = null;
         			try {
-						messageDigest = MessageDigest.getInstance(hashAlg, "BC");
+						messageDigest = MessageDigest.getInstance(hashAlg);
 						if (!MessageDigest.isEqual(messageImprint, messageDigest.digest(signature))){
 		        			returnValue.append("MessageImprint z èasovej peèiatky a podpis ds:SignatureValue sa nezhodujú.\n");
 		        		}
-					} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+					} catch (NoSuchAlgorithmException e) {
 						returnValue.append("Overenie èasovej peèiatky: Nepodporovaný messageDigest algoritmus v tokene pri porovnávaní s MessageImprint.\n");
 					}
 	        		
