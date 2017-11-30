@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
@@ -69,6 +70,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.util.Arrays;
@@ -352,6 +354,7 @@ public class Validator {
 	        		
         			java.security.Signature signer = null;
 	        		try {
+	        			Security.addProvider(new BouncyCastleProvider());
 	        			signer = java.security.Signature.getInstance(possibleSM.get(sigMethodElem.getAttribute("Algorithm")));
 	        			signer.initVerify(cert.getPublicKey());
 	        			signer.update(sigInfElBytes);
